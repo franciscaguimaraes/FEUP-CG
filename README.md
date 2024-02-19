@@ -1,10 +1,10 @@
 # CG 2023/2024
 
-## Group T0xG0y
+## Group T04G02
 | Name             | Number    | E-Mail             |
 | ---------------- | --------- | ------------------ |
-| John Doe         | 201901010 | ...                |
-| Jane Doe         | 201901011 | ...                |
+| Francisca Guimarães | 202004229 | up202004229@up.pt |
+| Inês Oliveira       | 202103343 | up202103343@up.pt |
 
 ----
 
