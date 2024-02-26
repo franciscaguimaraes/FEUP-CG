@@ -4,12 +4,14 @@
 
 ## TP 2 Notes
 
-- We accomplished all tasks. In exercise 1 we took some time to understand the rotation operation but at the end we understood everything.
+- We completed all tasks successfully. We took a bit of time to understand how rotation works in Exercise 1, but eventually, we understood it.
 
 ![Screenshot 1](screenshots/cg-t04g02-tp2-1.png)
 
-- In exercise 2 we did everything with no problems but we had some doubts where to place the unit cube. In the end, we believe we did it correctly.
+- In exercise, although we weren't sure where to place the unit cube at first, we think we got it right in the end. To make things clearer, we colored the cube differently from the tangram.
 
 ![Screenshot 2](screenshots/cg-t04g02-tp2-2.png)
 
+- In exercise 3, the problem was more or less the same as the previous one, just slighty different way of approaching it. We found no difficulties and decided to change the color of the cube for a better differenciation from the tangram and exercise 2.
 
+![Screenshot 3](screenshots/cg-t04g02-tp2-3.png)

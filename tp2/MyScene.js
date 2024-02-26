@@ -1,6 +1,8 @@
 import { CGFscene, CGFcamera, CGFaxis } from "../lib/CGF.js";
 import { MyTangram } from "./MyTangram.js"; 
 import { MyUnitCube } from "./MyUnitCube.js";
+import { MyQuad } from "./MyQuad.js";
+import { MyUnitCubeQuad } from "./MyUnitCubeQuad.js";
 
 /**
  * MyScene
@@ -28,12 +30,16 @@ export class MyScene extends CGFscene {
     this.axis = new CGFaxis(this);
     this.tangram = new MyTangram(this);
     this.unitCube = new MyUnitCube(this);
+    this.quad = new MyQuad(this);
+    this.cubeQuad = new MyUnitCubeQuad(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
     this.scaleFactor = 1;
     this.displayTangram = true;
     this.displayUnitCube = true;
+    this.displayQuad = true;
+    this.displayCubeQuad = true;
 
   }
   initLights() {
@@ -105,6 +111,7 @@ export class MyScene extends CGFscene {
 
   }
 
+  /*
   if(this.displayUnitCube){ 
 
     this.pushMatrix();
@@ -114,6 +121,18 @@ export class MyScene extends CGFscene {
     // change color to bright yellow
     this.setDiffuse(1, 1, 0, 1);
     this.unitCube.display();
+    this.popMatrix();
+  }*/
+
+  
+  if(this.displayCubeQuad){
+    this.pushMatrix();
+    this.scale(3,3,3);
+    // left up vertice in (0,0,0)
+    this.translate(0, -1, 1);
+    // change color to soft pink
+    this.setDiffuse(1, 0.71, 0.76, 1);
+    this.cubeQuad.display();
     this.popMatrix();
   }
     
