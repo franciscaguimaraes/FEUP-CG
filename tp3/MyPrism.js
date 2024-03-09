@@ -37,24 +37,22 @@ export class MyPrism extends CGFobject {
 				for (let k = 0; k < 4; k++) {
 					this.normals.push(...normal);
 				}
-	
 				ang += alphaAng;
 			}
 		}
 
-	
 		//The defined indices (and corresponding vertices)
 		//will be read in groups of three to draw triangles
 		this.primitiveType = this.scene.gl.TRIANGLES;
 		this.initGLBuffers();
 	}
 
-	updateBuffers(){
+	updateBuffers() {
         this.initBuffers();
     	this.initNormalVizBuffers();
     }
 
-	display(){
+	display() {
         this.scene.popMatrix();
         this.scene.pushMatrix();    
         this.scene.rotate(-Math.PI/2,1,0,0);
