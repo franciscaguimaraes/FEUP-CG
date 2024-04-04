@@ -1,11 +1,12 @@
 import { CGFobject } from "../lib/CGF.js";
 
 export class MySphere extends CGFobject {
-    constructor(scene, radius, slices, stacks) {
+    constructor(scene, radius, slices, stacks, panorama = false) {
         super(scene);
         this.radius = radius;
         this.slices = slices; // horizontal divisions
         this.stacks = stacks; // vertical divisions
+        this.panorama = panorama;
 
         this.initBuffers();
     }
@@ -32,9 +33,14 @@ export class MySphere extends CGFobject {
                 const y = this.radius * cosPhi;
                 const z = this.radius * sinTheta * sinPhi;
 
-                this.vertices.push(x, y, z); // add vertex
-                this.normals.push(x, y, z); // add normal same as vertex for unit sphere
-
+                if (this.panorama){
+                    this.vertices.push(x, y, z); // add vertex
+                    this.normals.push(-x, -y, -z); // different from vertex for panorama because of the inversion
+                } else {
+                    this.vertices.push(x, y, z); // add vertex
+                    this.normals.push(x, y, z); // add normal same as vertex for unit sphere
+                }
+                
                 // texture coordinates
                 const u = 1 - slice / this.slices; // inverted
                 const v = stack / this.stacks;
@@ -49,9 +55,14 @@ export class MySphere extends CGFobject {
                 const first = stack * (this.slices + 1) + slice;
                 const second = first + this.slices + 1;
 
-                // two triangles per slice
-                this.indices.push(first, second + 1, second);
-                this.indices.push(first, first + 1, second + 1);
+                if (this.panorama){
+                    this.indices.push(second, first + 1, first); // inverted
+                    this.indices.push(second + 1, first + 1, second); // inverted
+                } else {
+                    // two triangles per slice
+                    this.indices.push(first, second + 1, second);
+                    this.indices.push(first, first + 1, second + 1);
+                }
             }
         }
 
