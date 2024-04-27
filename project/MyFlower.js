@@ -1,66 +1,66 @@
-import { MyPetal } from "./MyPetal.js";
-import { MyReceptacle } from "./MyReceptacle.js";
-import { MyStem } from "./MyStem.js";
-import { CGFappearance } from "../lib/CGF.js";
+import {CGFobject} from '../lib/CGF.js';
+import {CGFappearance} from '../lib/CGF.js';
+import { MyPetal } from './MyPetal.js';
+import { MyReceptacle } from './MyReceptacle.js';
+import { MyStem } from './MyStem.js';
 
-/**
- * MyFlower
- * @constructor
- * @param scene
- */
-export class MyFlower {
-  
-    constructor(scene, petalRadius, numPetals, petalColor, centerRadius, centerColor, stemRadius, stemHeight, stemColor, leafColor, petalCurvatureAngle, petalAttachmentMinAngle, petalAttachmentMaxAngle, petalScale) {
-        this.scene = scene;
-        this.petal = new MyPetal(scene, petalCurvatureAngle);
-        this.center = new MyReceptacle(scene, centerRadius, 50);
-        this.stem = new MyStem(scene, stemRadius, stemRadius, stemHeight, 20, 1);
-        this.numPetals = numPetals;
+export class MyFlower extends CGFobject {
+    constructor(scene, externRadius, nrPetals, petalAngle, receptacleRadius, stemRadius, stemHeight, steamNrPlanes, nrStems, receptacleTexture, petalTexture, stemTexture){
+        super(scene);
+        this.externRadius = externRadius;
+        this.nrPetals = nrPetals;
+        this.petalAngle = petalAngle;
+        this.receptacleRadius = receptacleRadius;
+        this.stemRadius = stemRadius;
+        this.stemHeight = stemHeight;
+        this.steamNrPlanes = steamNrPlanes;
+        this.nrStems = nrStems;
+        this.receptacleTexture = receptacleTexture;
+        this.petalTexture = petalTexture;
+        this.stemTexture = stemTexture;
 
-        this.petalColor = new CGFappearance(scene);
-        this.petalColor.setAmbient(petalColor[0], petalColor[1], petalColor[2], petalColor[3]);
-        this.petalColor.setDiffuse(petalColor[0], petalColor[1], petalColor[2], petalColor[3]);
+        this.receptacleMaterial = new CGFappearance(scene);
+        this.receptacleMaterial.setEmission(1, 1, 1, 1);
+        this.petalMaterial = new CGFappearance(scene);
+        this.petalMaterial.setEmission(1, 1, 1, 1);
+        this.stemMaterial = new CGFappearance(scene);
+        this.stemMaterial.setEmission(1, 1, 1, 1);
 
-        this.centerColor = new CGFappearance(scene);
-        this.centerColor.setAmbient(centerColor[0], centerColor[1], centerColor[2], centerColor[3]);
-        this.centerColor.setDiffuse(centerColor[0], centerColor[1], centerColor[2], centerColor[3]);
-
-        this.stemColor = new CGFappearance(scene);
-        this.stemColor.setAmbient(stemColor[0], stemColor[1], stemColor[2], stemColor[3]);
-        this.stemColor.setDiffuse(stemColor[0], stemColor[1], stemColor[2], stemColor[3]);
-
-        this.leafColor = new CGFappearance(scene);
-        this.leafColor.setAmbient(leafColor[0], leafColor[1], leafColor[2], leafColor[3]);
-        this.leafColor.setDiffuse(leafColor[0], leafColor[1], leafColor[2], leafColor[3]);
-
-        this.petalRadius = petalRadius;
-        this.petalAttachmentMinAngle = petalAttachmentMinAngle;
-        this.petalAttachmentMaxAngle = petalAttachmentMaxAngle;
-        this.outerRadius = 4.5;
-        this.petalDistance = this.outerRadius/3;
-        this.petalScale = petalScale || 0.5;
+        this.initBuffers();
     }
 
-    display() {
-        this.scene.pushMatrix();
-        this.scene.translate(0, 0, -2);
-        this.stem.display();
-        this.scene.popMatrix();
+    initBuffers(){
+        this.receptacle = new MyReceptacle(this.scene, this.receptacleRadius, this.receptacleColor);
+        this.petal = new MyPetal(this.scene, this.petalColor, this.petalMinAngle, this.petalMaxAngle);
+        this.stem = new MyStem(this.scene, this.stemRadius, this.stemHeight, this.steamNrPlanes, this.nrStems);
 
-        this.scene.pushMatrix();
-        this.scene.translate(0, 0, 0);
-        this.center.display();
-        this.scene.popMatrix();
+    }
 
-        for (let i = 0; i < this.numPetals; i++) {
+    display(){
+        for(var i = 0; i < this.nrPetals; i++){
             this.scene.pushMatrix();
-            let angle = i * 2 * Math.PI / this.numPetals;
-            this.scene.rotate(angle, 0, 0, 1);
-            this.scene.translate(this.petalDistance, 0, 0);
-            this.petalColor.apply();
-            this.scene.scale(this.petalScale, this.petalScale, this.petalScale);
+            this.scene.rotate(2 * Math.PI * i / this.nrPetals, 0, 1, 0);
+            this.scene.rotate(Math.PI / 2, 1, 0, 0);
+            this.scene.translate(this.receptacleRadius + 2 - (Math.sin(this.petalAngle)), 0, -Math.sin(this.petalAngle));
+            this.petalMaterial.apply();
+            this.scene.rotate(this.petalAngle,0,1,0);
             this.petal.display();
             this.scene.popMatrix();
         }
+
+        this.scene.pushMatrix();
+        this.receptacleMaterial.apply();
+        this.receptacle.display();
+        this.scene.popMatrix();
+        this.scene.pushMatrix();
+        this.stemMaterial.apply();
+        this.stem.display();
+        this.scene.popMatrix();
     }
+
+    setColor(material, color) {
+        material.setDiffuse(color[0], color[1], color[2], color[3]);
+        material.setAmbient(color[0], color[1], color[2], color[3]);
+    }
+
 }

@@ -16,7 +16,7 @@ export class MyReceptacle extends CGFobject {
         this.texCoords = [];
 
         this.addCircleVertices(1); 
-        this.addCircleVertices(-1); 
+        this.addCircleVertices(-1);
 
         for (let slice = 1; slice <= this.slices; slice++) {
             this.indices.push(0, slice, slice + 1);
