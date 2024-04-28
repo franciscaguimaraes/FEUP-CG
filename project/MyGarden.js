@@ -16,6 +16,7 @@ export class MyGarden extends CGFobject {
             let flowerRow = [];
             for (let j = 0; j < this.numCols; j++) {
                 const minReceptacleRadius = 0.6, maxReceptacleRadius = 1.2;
+                const minReceptacleSlices = 10, maxReceptacleSlices = 12;
                 const minStemPlanes = 10, maxStemPlanes = 24;
                 const minStemCount = 3, maxStemCount = 6;
                 const minHeightStem = 6, maxHeightStem = 10;
@@ -26,6 +27,7 @@ export class MyGarden extends CGFobject {
                 const minFlowerAngle = 20, maxFlowerAngle = 80;
 
                 const radiusReceptacle = Math.random() * (maxReceptacleRadius - minReceptacleRadius) + minReceptacleRadius;
+                const receptacleSlices = Math.floor(Math.random() * (maxReceptacleSlices - minReceptacleSlices) + minReceptacleSlices);
                 const numStemPlanes = Math.floor(Math.random() * (maxStemPlanes - minStemPlanes) + minStemPlanes);
                 const countStems = Math.floor(Math.random() * (maxStemCount - minStemCount) + minStemCount);
                 const heightStem = Math.random() * (maxHeightStem - minHeightStem) + minHeightStem;
@@ -38,7 +40,7 @@ export class MyGarden extends CGFobject {
                 const externRadius = Math.random() * (maxExternRadius - minExternRadius) + minExternRadius;
                 const flowerAngle = Math.random() * (maxFlowerAngle - minFlowerAngle) + minFlowerAngle;
 
-                const flower = new MyFlower(this.scene, externRadius, countPetals, anglePetal, radiusReceptacle, radiusStem, heightStem, numStemPlanes, countStems, this.texturesReceptacle[indexTextureReceptacle], this.texturesPetal[indexTexturePetal], this.texturesStem[indexTextureStem], flowerAngle);
+                const flower = new MyFlower(this.scene, externRadius, countPetals, anglePetal, radiusReceptacle, receptacleSlices, radiusStem, heightStem, numStemPlanes, countStems, this.texturesReceptacle[indexTextureReceptacle], this.texturesPetal[indexTexturePetal], this.texturesStem[indexTextureStem], flowerAngle);
                 flowerRow.push(flower);
             }
             this.garden.push(flowerRow);

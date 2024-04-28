@@ -2,12 +2,13 @@ import { CGFobject, CGFappearance} from '../lib/CGF.js';
 import { MyStem } from './MyStem.js';
 import { MyFlowerTop } from './MyFlowerTop.js';
 export class MyFlower extends CGFobject {
-    constructor(scene, externRadius, nrPetals, petalAngle, receptacleRadius, stemRadius, stemHeight, steamNrPlanes, nrStems, receptacleTexture, petalTexture, stemTexture, flowerAngle){
+    constructor(scene, externRadius, nrPetals, petalAngle, receptacleRadius, receptacleSlices, stemRadius, stemHeight, steamNrPlanes, nrStems, receptacleTexture, petalTexture, stemTexture, flowerAngle){
         super(scene);
         this.externRadius = externRadius;
         this.nrPetals = nrPetals;
         this.petalAngle = petalAngle;
         this.receptacleRadius = receptacleRadius;
+        this.receptacleSlices = receptacleSlices;
         this.stemRadius = stemRadius;
         this.stemHeight = stemHeight;
         this.steamNrPlanes = steamNrPlanes;
@@ -25,7 +26,7 @@ export class MyFlower extends CGFobject {
     }
 
     initBuffers(){
-        this.flowerTop = new MyFlowerTop(this.scene, this.externRadius, this.nrPetals, this.petalAngle, this.receptacleRadius, this.receptacleTexture, this.petalTexture);
+        this.flowerTop = new MyFlowerTop(this.scene, this.externRadius, this.nrPetals, this.petalAngle, this.receptacleRadius, this.receptacleSlices, this.receptacleTexture, this.petalTexture);
         this.stem = new MyStem(this.scene, this.stemRadius, this.stemHeight, this.steamNrPlanes, this.nrStems);
     }
 
