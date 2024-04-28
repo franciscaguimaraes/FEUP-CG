@@ -21,7 +21,9 @@ export class MyGarden extends CGFobject {
                 const minHeightStem = 6, maxHeightStem = 10;
                 const minRadiusStem = 0.15, maxRadiusStem = 0.3;
                 const minPetalCount = 6, maxPetalCount = 12;
-                const minAnglePetal = 10, maxAnglePetal = 100;
+                const minAnglePetal = 20, maxAnglePetal = 40;
+                const minExternRadius = 5, maxExternRadius = 7;
+                const minFlowerAngle = 20, maxFlowerAngle = 80;
 
                 const radiusReceptacle = Math.random() * (maxReceptacleRadius - minReceptacleRadius) + minReceptacleRadius;
                 const numStemPlanes = Math.floor(Math.random() * (maxStemPlanes - minStemPlanes) + minStemPlanes);
@@ -33,8 +35,10 @@ export class MyGarden extends CGFobject {
                 const indexTextureReceptacle = Math.floor(Math.random() * this.texturesReceptacle.length);
                 const indexTexturePetal = Math.floor(Math.random() * this.texturesPetal.length);
                 const indexTextureStem = Math.floor(Math.random() * this.texturesStem.length);
+                const externRadius = Math.random() * (maxExternRadius - minExternRadius) + minExternRadius;
+                const flowerAngle = Math.random() * (maxFlowerAngle - minFlowerAngle) + minFlowerAngle;
 
-                const flower = new MyFlower(this.scene, 5, countPetals, anglePetal, radiusReceptacle, radiusStem, heightStem, numStemPlanes, countStems, this.texturesReceptacle[indexTextureReceptacle], this.texturesPetal[indexTexturePetal], this.texturesStem[indexTextureStem]);
+                const flower = new MyFlower(this.scene, externRadius, countPetals, anglePetal, radiusReceptacle, radiusStem, heightStem, numStemPlanes, countStems, this.texturesReceptacle[indexTextureReceptacle], this.texturesPetal[indexTexturePetal], this.texturesStem[indexTextureStem], flowerAngle);
                 flowerRow.push(flower);
             }
             this.garden.push(flowerRow);

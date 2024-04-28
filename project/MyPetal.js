@@ -18,6 +18,17 @@ export class MyPetal extends CGFobject {
 			2, 0, 0
 		];
 
+		this.texCoords = [
+            0, 0,   // 0
+            0.5, 0, // 1
+            0.5, 1, // 2
+            1, 0.5, // 3
+            0, 0,   // 4
+            0.5, 0, // 5
+            0.5, 1, // 6
+            1, 0.5  // 7
+        ];
+
 		//Counter-clockwise reference of vertices
 		this.indices = [
 			0, 1, 2,

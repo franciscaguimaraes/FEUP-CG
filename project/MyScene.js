@@ -44,9 +44,9 @@ export class MyScene extends CGFscene {
   loadTextures() {
     const texturePaths = {
       panorama: "images/panorama4.jpg",
-      receptacles: ["images/receptacle_1.jpg", "images/receptacle_2.jpg", "images/receptacle_3.jpg", "images/receptacle_4.jpg"],
-      petals: ["images/petal_1.jpg", "images/petal_2.jpg", "images/petal_3.jpg", "images/petal_4.jpg"],
-      stems: ["images/stem_1.jpg", "images/stem_2.jpg", "images/stem_3.jpg", "images/stem_4.jpg"]
+      receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
+      petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
+      stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"]
     };
 
     this.textures = {
