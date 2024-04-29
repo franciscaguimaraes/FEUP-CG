@@ -22,6 +22,9 @@ export class MyBee extends CGFobject {
         this.antennae = new MyAntannae(scene);
         this.leg = new MyLeg(scene);
         this.wing = new MyWings(scene);
+
+        // Movement
+        this.elapsedTime = 0;
                 
         this.initMaterials();
     }
@@ -74,11 +77,19 @@ export class MyBee extends CGFobject {
         this.scene.pushMatrix();
         this.scene.translate(0, 3, 0);
         this.scene.scale(0.4, 0.4, 0.4);
+        this.scene.translate(0, Math.sin(this.elapsedTime) * 0.5, 0);
         this.draw();
         this.scene.popMatrix();
     }
 
+    update(t) {
+      t /= 1000;
+      this.elapsedTime += t;
+    }
+
     draw() {
+
+
         // Head
         this.scene.pushMatrix();
         this.scene.rotate(Math.PI / 4, 1, 0, 0);
@@ -125,12 +136,16 @@ export class MyBee extends CGFobject {
 
         // Wing Left
         this.scene.pushMatrix();
+        this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0);
+        this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1)
         this.wingMaterial.apply();
         this.wing.displayLeftWings();
         this.scene.popMatrix();
 
         // Wing Right
         this.scene.pushMatrix();
+        this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0);
+        this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1)
         this.wingMaterial.apply();
         this.wing.displayRightWings();
         this.scene.popMatrix();
