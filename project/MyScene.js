@@ -2,6 +2,7 @@ import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyGarden } from "./Flowers/MyGarden.js";
+import {MyRock} from "./Rocks/MyRock.js";
 
 /**
  * MyScene
@@ -36,12 +37,14 @@ export class MyScene extends CGFscene {
     this.displayGarden = true;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
+    this.displayRock = true;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
     this.plane = new MyPlane(this, 30);
     this.panorama = new MyPanorama(this, this.textures.panorama);
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
+    this.rock = new MyRock(this, 1, 20, 20, this.textures.rock);
   }
 
   loadTextures() {
@@ -49,14 +52,16 @@ export class MyScene extends CGFscene {
       panorama: "images/panorama_flowers.jpg",
       receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
       petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
-      stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"]
+      stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"],
+      rock: "images/rock.jpg"
     };
 
     this.textures = {
       panorama: new CGFtexture(this, texturePaths.panorama),
       receptacles: texturePaths.receptacles.map(path => new CGFtexture(this, path)),
       petals: texturePaths.petals.map(path => new CGFtexture(this, path)),
-      stems: texturePaths.stems.map(path => new CGFtexture(this, path))
+      stems: texturePaths.stems.map(path => new CGFtexture(this, path)),
+      rock: new CGFtexture(this, texturePaths.rock)
     };
 
     this.texture = new CGFtexture(this, "images/terrain.jpg");
@@ -100,7 +105,7 @@ export class MyScene extends CGFscene {
 
     if(this.displayAxis) this.axis.display();
 
-    if(this.displayPlane){
+    /*if(this.displayPlane){
       this.pushMatrix();
       this.appearance.apply();
       this.translate(0,-4.5,0);
@@ -108,14 +113,21 @@ export class MyScene extends CGFscene {
       this.rotate(-Math.PI/2.0,1,0,0);
       this.plane.display();
       this.popMatrix();
-    }
+    }*/
     
 
     if (this.displayPanorama) this.panorama.display();
 
-    if (this.displayGarden){
+    /*if (this.displayGarden){
       this.translate(-30,0,50);
       this.garden.display();
+    }*/
+
+    if(this.displayRock){
+      this.pushMatrix();
+      this.rock.display();
+      this.popMatrix();
     }
+
   }
 }
