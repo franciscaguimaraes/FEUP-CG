@@ -64,7 +64,6 @@ export class MyRockSet extends CGFobject {
                     baseY - 0.8 * radius * currentLayer,   
                     baseZ - layerRadius * Math.sin(angle)  
                 ];
-                console.log(rock.position);
 
                 rock.rotation = [
                     Math.random() * Math.PI, 
@@ -101,7 +100,6 @@ export class MyRockSet extends CGFobject {
                 -3, 
                 Math.random() * 50 - 30  
             ];
-            console.log(rock.position);
 
             rock.rotation = [
                 Math.random() * Math.PI, 

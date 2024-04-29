@@ -4,7 +4,7 @@ import { MyPanorama } from "./MyPanorama.js";
 import { MyGarden } from "./Flowers/MyGarden.js";
 import {MyRock} from "./Rocks/MyRock.js";
 import {MyRockSet} from "./Rocks/MyRockSet.js";
-
+import {MyBee} from "./Bee/MyBee.js";
 
 /**
  * MyScene
@@ -28,20 +28,24 @@ export class MyScene extends CGFscene {
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.depthFunc(this.gl.LEQUAL);
 
+    // Transparency
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.enable(this.gl.BLEND);    
+
     // Initialize textures
     this.enableTextures(true);
     this.loadTextures();
 
     this.displayAxis = true;
-    this.displayPlane = true;
+    this.displayPlane = false;
     this.scaleFactor = 1;
     this.displayPanorama = true;
     this.displayGarden = false;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
     this.displayRock = false;
-    this.displayRockSet = true;
-
+    this.displayRockSet = false;
+    this.displayBee = true;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -50,6 +54,7 @@ export class MyScene extends CGFscene {
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
     this.rock = new MyRock(this, 1, 20, 20, this.textures.rock);
     this.rockSet = new MyRockSet(this, 10, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
+    this.bee = new MyBee(this, 0, 0, 0);
   }
 
   loadTextures() {
@@ -84,8 +89,8 @@ export class MyScene extends CGFscene {
 
   initCameras() {
     this.camera = new CGFcamera(
-      1.5, 0.1, 1000,
-      vec3.fromValues(15, 15, 15),
+      0.9, 0.5, 1000,
+      vec3.fromValues(20, 20, 15),
       vec3.fromValues(0, 0, 0)
     );
   }
@@ -136,6 +141,12 @@ export class MyScene extends CGFscene {
     if(this.displayRockSet){
       this.pushMatrix();
       this.rockSet.display();
+      this.popMatrix();
+    }
+
+    if(this.displayBee){
+      this.pushMatrix();
+      this.bee.display();
       this.popMatrix();
     }
 

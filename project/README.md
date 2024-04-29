@@ -20,3 +20,5 @@
 ![Screenshot 5](screenshots/project-t04g02-3a.png)
 ![Screenshot 6](screenshots/project-t04g02-3b.png)
 
+### 4. Bee
+![Screenshot 7](screenshots/project-t04g02-4.png)
