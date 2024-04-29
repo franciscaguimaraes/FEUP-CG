@@ -30,6 +30,7 @@ export class MyScene extends CGFscene {
     this.loadTextures();
 
     this.displayAxis = true;
+    this.displayPlane = true;
     this.scaleFactor = 1;
     this.displayPanorama = true;
     this.displayGarden = true;
@@ -58,9 +59,11 @@ export class MyScene extends CGFscene {
       stems: texturePaths.stems.map(path => new CGFtexture(this, path))
     };
 
+    this.texture = new CGFtexture(this, "images/terrain.jpg");
     this.appearance = new CGFappearance(this);
+    this.appearance.setTexture(this.texture);
     this.appearance.setTextureWrap('REPEAT', 'REPEAT');
-  }
+   }
 
   initLights() {
     this.lights[0].setPosition(15, 0, 5, 1);
@@ -95,9 +98,24 @@ export class MyScene extends CGFscene {
     this.loadIdentity();
     this.applyViewMatrix();
 
-    if (this.displayAxis) this.axis.display();
+    if(this.displayAxis) this.axis.display();
+
+    if(this.displayPlane){
+      this.pushMatrix();
+      this.appearance.apply();
+      this.translate(0,-4.5,0);
+      this.scale(400,400,400);
+      this.rotate(-Math.PI/2.0,1,0,0);
+      this.plane.display();
+      this.popMatrix();
+    }
+    
 
     if (this.displayPanorama) this.panorama.display();
-    if (this.displayGarden) this.garden.display();
+
+    if (this.displayGarden){
+      this.translate(-30,0,50);
+      this.garden.display();
+    }
   }
 }

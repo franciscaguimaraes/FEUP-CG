@@ -12,6 +12,7 @@ export class MyGarden extends CGFobject {
         this.numCols = 8;
         this.displayRows = displayRows; 
         this.displayCols = displayCols;
+        this.randomScaling = Math.random() * (0.8 - 0.3) + 0.3; // random between 0.3 and 0.8
         this.garden = [];
         this.garden = this.createGarden(this.numRows, this.numCols);
     }
@@ -46,6 +47,7 @@ export class MyGarden extends CGFobject {
                 const flowerAngle = Math.random() * (maxFlowerAngle - minFlowerAngle) + minFlowerAngle;
 
                 const flower = new MyFlower(this.scene, externRadius, countPetals, anglePetal, radiusReceptacle, receptacleSlices, radiusStem, heightStem, numStemPlanes, countStems, this.texturesReceptacle[indexTextureReceptacle], this.texturesPetal[indexTexturePetal], this.texturesStem[indexTextureStem], flowerAngle);
+        
                 flowerRow.push(flower);
             }
             this.garden.push(flowerRow);
@@ -66,6 +68,7 @@ export class MyGarden extends CGFobject {
                 const flower = this.garden[i][j];
                 this.scene.pushMatrix();
                 this.scene.translate(j * flower.externRadius * 2.2, 0, i * flower.externRadius * 2.2);
+                this.scene.scale(this.randomScaling, this.randomScaling, this.randomScaling);
                 flower.display();
                 this.scene.popMatrix();
             }
