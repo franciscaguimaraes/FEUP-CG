@@ -1,7 +1,7 @@
 import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture } from "../lib/CGF.js";
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
-import { MyGarden } from "./MyGarden.js";
+import { MyGarden } from "./Flowers/MyGarden.js";
 
 /**
  * MyScene
@@ -45,7 +45,7 @@ export class MyScene extends CGFscene {
 
   loadTextures() {
     const texturePaths = {
-      panorama: "images/panorama4.jpg",
+      panorama: "images/panorama_flowers.jpg",
       receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
       petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
       stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"]

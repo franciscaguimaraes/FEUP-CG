@@ -1,4 +1,4 @@
-import { CGFobject, CGFappearance} from '../lib/CGF.js';
+import { CGFobject, CGFappearance} from '../../lib/CGF.js';
 import { MyStem } from './MyStem.js';
 import { MyFlowerTop } from './MyFlowerTop.js';
 export class MyFlower extends CGFobject {
