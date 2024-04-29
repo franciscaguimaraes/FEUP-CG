@@ -3,6 +3,8 @@ import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyGarden } from "./Flowers/MyGarden.js";
 import {MyRock} from "./Rocks/MyRock.js";
+import {MyRockSet} from "./Rocks/MyRockSet.js";
+
 
 /**
  * MyScene
@@ -34,10 +36,12 @@ export class MyScene extends CGFscene {
     this.displayPlane = true;
     this.scaleFactor = 1;
     this.displayPanorama = true;
-    this.displayGarden = true;
+    this.displayGarden = false;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
-    this.displayRock = true;
+    this.displayRock = false;
+    this.displayRockSet = true;
+
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -45,6 +49,7 @@ export class MyScene extends CGFscene {
     this.panorama = new MyPanorama(this, this.textures.panorama);
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
     this.rock = new MyRock(this, 1, 20, 20, this.textures.rock);
+    this.rockSet = new MyRockSet(this, 10, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
   }
 
   loadTextures() {
@@ -105,7 +110,7 @@ export class MyScene extends CGFscene {
 
     if(this.displayAxis) this.axis.display();
 
-    /*if(this.displayPlane){
+    if(this.displayPlane){
       this.pushMatrix();
       this.appearance.apply();
       this.translate(0,-4.5,0);
@@ -113,19 +118,24 @@ export class MyScene extends CGFscene {
       this.rotate(-Math.PI/2.0,1,0,0);
       this.plane.display();
       this.popMatrix();
-    }*/
+    }
     
-
     if (this.displayPanorama) this.panorama.display();
 
-    /*if (this.displayGarden){
+    if (this.displayGarden){
       this.translate(-30,0,50);
       this.garden.display();
-    }*/
+    }
 
     if(this.displayRock){
       this.pushMatrix();
       this.rock.display();
+      this.popMatrix();
+    }
+
+    if(this.displayRockSet){
+      this.pushMatrix();
+      this.rockSet.display();
       this.popMatrix();
     }
 
