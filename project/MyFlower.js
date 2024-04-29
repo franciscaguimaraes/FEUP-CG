@@ -27,7 +27,7 @@ export class MyFlower extends CGFobject {
 
     initBuffers(){
         this.flowerTop = new MyFlowerTop(this.scene, this.externRadius, this.nrPetals, this.petalAngle, this.receptacleRadius, this.receptacleSlices, this.receptacleTexture, this.petalTexture);
-        this.stem = new MyStem(this.scene, this.stemRadius, this.stemHeight, this.steamNrPlanes, this.nrStems);
+        this.stem = new MyStem(this.scene, this.stemRadius, this.stemHeight, this.steamNrPlanes, this.nrStems, this.stemTexture);
     }
 
     display(){

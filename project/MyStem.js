@@ -1,15 +1,19 @@
-import { CGFobject } from '../lib/CGF.js';
+import { CGFobject, CGFappearance } from '../lib/CGF.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MyTriangle } from './MyTriangle.js';
 
 export class MyStem extends CGFobject {
-    constructor(scene, radius, height, stacks, nrCylinders) {
+    constructor(scene, radius, height, stacks, nrCylinders, stemTexture) {
         super(scene);
         this.radius = radius;
         this.height = height;
         this.stacks = stacks;
         this.slices = 20;
         this.nrCylinders = nrCylinders;
+        this.stemTexture = stemTexture;
+        this.stemCurvatureValue = Math.random() >= 0.5 ? 1 : -1;
+        this.stickAngle = Math.random() * 2 * Math.PI;
+        this.triangle = new MyTriangle(this.scene, this.stemTexture);
         this.initBuffers();
     }
 
@@ -23,61 +27,58 @@ export class MyStem extends CGFobject {
 
     display() {
         var cylinderHeight = this.height / this.nrCylinders;
-        for(let i = 0; i < this.nrCylinders; i++){
+        this.scene.pushMatrix();
+        this.scene.rotate(Math.PI / 2, 1, 0, 0);
 
-            this.scene.pushMatrix();
-            this.scene.rotate( Math.PI / 2,1, 0, 0);
-            if(i == 0){
-                this.scene.rotate(Math.PI / 8, 0, 1, 0);
-            }else{
-                if(i % 3 == 0){
-                    this.scene.translate(0, 0, (Math.cos(Math.PI / 8) *cylinderHeight *  (i/2) + (cylinderHeight * (i/2))) - ((Math.tan(Math.PI/8) * this.radius * 2 ) * (i-1)));
-                    this.scene.rotate(Math.PI / 8, 0, 1, 0);
-                    this.buildLeaf(i);
-                } else {
-                if(i % 3 == 1){
-                    this.scene.translate( Math.sin(Math.PI / 8) * cylinderHeight * i, 0,- (this.radius / 2 )+  (cylinderHeight * i * Math.cos(Math.PI / 8)));
-                    this.buildLeaf(i);
-                } else {
-                    this.scene.translate((Math.sin(Math.PI / 8) *cylinderHeight* (i/2)), 0, (Math.cos(Math.PI / 8) *cylinderHeight *  (i/2) + (cylinderHeight * (i/2))) - (Math.tan(Math.PI/8) * this.radius * 2));
-                    this.scene.rotate(-Math.PI / 8, 0, 1, 0);
-                    this.buildLeaf(i);
-                }}
+        for (let i = 0; i < this.nrCylinders; i++) {
+            let curveAmount = this.stemCurvatureValue * Math.sin (i / this.nrCylinders * Math.PI) * 0.25;
+            
+            if(i==0) {
+                this.scene.rotate(curveAmount, 0, 1, 0);
+            } else if(i%2==0) {
+                this.scene.rotate(curveAmount, 0, 1, 0);
+                this.drawLeaf(this.stickAngle);
+            } else {
+                this.scene.rotate(-curveAmount, 0, 1, 0);
+                this.drawLeaf(-this.stickAngle);
             }
             this.cylinders[i].display();
-            this.scene.popMatrix();
+            this.scene.translate(0, 0, cylinderHeight);
         }
+        this.scene.popMatrix();
     }
 
-    buildLeaf(i) {
+    drawLeaf(angle) {
         this.scene.pushMatrix();
-        // Create the thin cylinder
-        var leafCylinder = new MyCylinder(this.scene, 0.05, 3, 10, 20);
-        this.scene.rotate((2*Math.PI/3)*i,0,0,1);
-        this.scene.rotate(Math.PI/2, 1,0,0);
-        leafCylinder.display();
+        this.drawStick(angle);
         this.scene.popMatrix();
+    }
 
-        //First triangle
-        var height = 3
+    drawFirstLeaf() {
         this.scene.pushMatrix();
-        var leafTri = new MyTriangle(this.scene);
-        this.scene.rotate((2*Math.PI/3)*i,0,0,1);
-        this.scene.rotate(Math.PI/2, 1,0,0)
-        this.scene.rotate(19*Math.PI/20,0,1,0);
-        this.scene.scale(0.5,1,height)
-        leafTri.display();
+        this.scene.translate(0.7, 0.7, 1);
+        this.triangle.display();
         this.scene.popMatrix();
+    }
 
-        //Second triangle
+    drawSecondLeaf() {
         this.scene.pushMatrix();
-        var leafTri = new MyTriangle(this.scene);
-        this.scene.rotate((2*Math.PI/3)*i,0,0,1);
-        this.scene.rotate(Math.PI/2, 1,0,0)
-        this.scene.rotate(-19*Math.PI/20,0,1,0);
-        this.scene.scale(0.5,1,height)
+        this.scene.translate(0, 0, 2);
+        this.scene.rotate(Math.PI, 0, 1, 0);
+        this.scene.translate(0.7, -0.3, 0);
+        this.triangle.display();
+        this.scene.popMatrix();
+    }
 
-        leafTri.display();
+    drawStick(angle) {
+        this.scene.pushMatrix();
+        this.scene.rotate(Math.PI/2, 0, 1, 0);
+        this.scene.rotate(angle, 1, 0, 0);
+        this.scene.scale(0.3, 0.3, 1);
+        this.stick = new MyCylinder(this.scene, this.radius, 2, this.stacks, this.slices);
+        this.stick.display();
+        this.drawFirstLeaf();
+        this.drawSecondLeaf();
         this.scene.popMatrix();
     }
 }

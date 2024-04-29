@@ -29,16 +29,18 @@ export class MyScene extends CGFscene {
     this.enableTextures(true);
     this.loadTextures();
 
-    // Initialize scene objects
-    this.axis = new CGFaxis(this);
-    this.plane = new MyPlane(this, 30);
-    this.panorama = new MyPanorama(this, this.textures.panorama);
-    this.garden = new MyGarden(this, 5, 5, this.textures.receptacles, this.textures.petals, this.textures.stems); 
-
     this.displayAxis = true;
     this.scaleFactor = 1;
     this.displayPanorama = true;
     this.displayGarden = true;
+    this.gardenNumRows = 4;
+    this.gardenNumColumns = 4;
+
+    // Initialize scene objects
+    this.axis = new CGFaxis(this);
+    this.plane = new MyPlane(this, 30);
+    this.panorama = new MyPanorama(this, this.textures.panorama);
+    this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
   }
 
   loadTextures() {
@@ -74,6 +76,10 @@ export class MyScene extends CGFscene {
       vec3.fromValues(0, 0, 0)
     );
   }
+
+  updateGardenDimensions(){
+    this.garden.setDisplayDimensions(this.gardenNumRows, this.gardenNumColumns);
+}
 
   setDefaultAppearance() {
     this.setAmbient(0.2, 0.4, 0.8, 1.0);

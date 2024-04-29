@@ -2,19 +2,24 @@ import {CGFobject} from '../lib/CGF.js';
 import { MyFlower } from './MyFlower.js';
 
 export class MyGarden extends CGFobject {
-    constructor(scene, numRows, numCols, texturesReceptacle, texturesPetal, texturesStem) {
+    constructor(scene, displayRows, displayCols, texturesReceptacle, texturesPetal, texturesStem) {
         super(scene);
         this.scene = scene;
-        this.numRows = numRows;
-        this.numCols = numCols;
         this.texturesReceptacle = texturesReceptacle;
         this.texturesPetal = texturesPetal;
         this.texturesStem = texturesStem;
+        this.numRows = 8;
+        this.numCols = 8;
+        this.displayRows = displayRows; 
+        this.displayCols = displayCols;
         this.garden = [];
+        this.garden = this.createGarden(this.numRows, this.numCols);
+    }
 
-        for (let i = 0; i < this.numRows; i++) {
+    createGarden(numRows, numCols) {
+        for (let i = 0; i < numRows; i++) {
             let flowerRow = [];
-            for (let j = 0; j < this.numCols; j++) {
+            for (let j = 0; j < numCols; j++) {
                 const minReceptacleRadius = 0.6, maxReceptacleRadius = 1.2;
                 const minReceptacleSlices = 10, maxReceptacleSlices = 12;
                 const minStemPlanes = 10, maxStemPlanes = 24;
@@ -45,14 +50,22 @@ export class MyGarden extends CGFobject {
             }
             this.garden.push(flowerRow);
         }
+        return this.garden;
     }
 
+    setDisplayDimensions(rows, columns) {
+        this.displayRows = rows;
+        this.displayCols = columns;
+        this.createGarden(this.numRows, this.numCols);
+    }
+
+
     display() {
-        for (let i = 0; i < this.numRows; i++) {
-            for (let j = 0; j < this.numCols; j++) {
+        for (let i = 0; i < this.displayRows; i++) {
+            for (let j = 0; j < this.displayCols; j++) {
                 const flower = this.garden[i][j];
                 this.scene.pushMatrix();
-                this.scene.translate(j * flower.externRadius * 2.2, 0, i * flower.externRadius * 2.2); // Slightly increased spacing
+                this.scene.translate(j * flower.externRadius * 2.2, 0, i * flower.externRadius * 2.2);
                 flower.display();
                 this.scene.popMatrix();
             }
