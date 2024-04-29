@@ -25,6 +25,11 @@ export class MyBee extends CGFobject {
 
         // Movement
         this.elapsedTime = 0;
+        this.position = {x: x, y: y, z: z}; // Position
+        this.defaultPos = {x: x, y: y, z: z};
+        this.orientation = 0; // Orientation
+        this.scale = 1;
+        this.speed = 0;
                 
         this.initMaterials();
     }
@@ -77,170 +82,229 @@ export class MyBee extends CGFobject {
         this.scene.pushMatrix();
         this.scene.translate(0, 3, 0);
         this.scene.scale(0.4, 0.4, 0.4);
-        this.scene.translate(0, Math.sin(this.elapsedTime) * 0.5, 0);
+        this.scene.translate(0, Math.sin(this.elapsedTime) * 0.5, 0); // oscilation
         this.draw();
         this.scene.popMatrix();
     }
 
-    update(t) {
-      t /= 1000;
-      this.elapsedTime += t;
+    update(delta_t, scaleFactor, speedFactor) {
+      this.scale = scaleFactor;
+      this.checkKeys(speedFactor/5);
+      
+      this.elapsedTime += delta_t / 1000;
+
+      // Update position
+      this.position.x += this.speed * Math.sin(this.orientation);
+      this.position.z += this.speed * Math.cos(this.orientation);
+    }
+
+    turn(v) {
+      this.orientation += v
+    }
+
+    accelerate(v) {
+      this.speed = Math.max(this.speed + v, 0)
+    }
+
+    reset() {
+      this.speed = 0
+      this.orientation = 0
+      this.position = {x: this.defaultPos.x, y: this.defaultPos.y, z: this.defaultPos.z}
     }
 
     draw() {
 
+      this.scene.translate(this.position.x, this.position.y, this.position.z);
+      this.scene.rotate(this.orientation, 0, 1, 0);
+      this.scene.scale(this.scale, this.scale, this.scale);
 
-        // Head
-        this.scene.pushMatrix();
-        this.scene.rotate(Math.PI / 4, 1, 0, 0);
-        this.scene.scale(1, 1, 1.5);
-        this.headMaterial.apply();
-        this.head.display();
-        this.scene.popMatrix();
+      // Head
+      this.scene.pushMatrix();
+      this.scene.rotate(Math.PI / 4, 1, 0, 0);
+      this.scene.scale(1, 1, 1.5);
+      this.headMaterial.apply();
+      this.head.display();
+      this.scene.popMatrix();
 
-        // Eye Left
-        this.scene.pushMatrix();
-        this.scene.translate(-0.6, 0.2, 0.5);
-        this.scene.rotate(Math.PI / 4, 1, 0, 0);
-        this.scene.scale(0.5, 0.5, 0.8);
-        this.eyeMaterial.apply();
-        this.eye.display();
-        this.scene.popMatrix();
+      // Eye Left
+      this.scene.pushMatrix();
+      this.scene.translate(-0.6, 0.2, 0.5);
+      this.scene.rotate(Math.PI / 4, 1, 0, 0);
+      this.scene.scale(0.5, 0.5, 0.8);
+      this.eyeMaterial.apply();
+      this.eye.display();
+      this.scene.popMatrix();
 
-        // Eye Right
-        this.scene.pushMatrix();
-        this.scene.translate(0.6, 0.2, 0.5);
-        this.scene.rotate(Math.PI / 4, 1, 0, 0);
-        this.scene.rotate(Math.PI, 0, 1, 0);
-        this.scene.scale(0.5, 0.5, 0.8);
-        this.eyeMaterial.apply();
-        this.eye.display();
-        this.scene.popMatrix();
+      // Eye Right
+      this.scene.pushMatrix();
+      this.scene.translate(0.6, 0.2, 0.5);
+      this.scene.rotate(Math.PI / 4, 1, 0, 0);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.scale(0.5, 0.5, 0.8);
+      this.eyeMaterial.apply();
+      this.eye.display();
+      this.scene.popMatrix();
 
-        // Torax
-        this.scene.pushMatrix();
-        this.scene.translate(0, -0.5, -2.3);
-        this.scene.scale(1, 1, 1.5);
-        this.toraxMaterial.apply();
-        this.torax.display();
-        this.scene.popMatrix();
+      // Torax
+      this.scene.pushMatrix();
+      this.scene.translate(0, -0.5, -2.3);
+      this.scene.scale(1, 1, 1.5);
+      this.toraxMaterial.apply();
+      this.torax.display();
+      this.scene.popMatrix();
 
-        // Abdomen
-        this.scene.pushMatrix();
-        this.scene.translate(0, -1.3, -4.5);
-        this.scene.rotate(Math.PI / 4, 1, 0, 0);
-        this.scene.scale(1, 1.5, 1);
-        this.abdomenMaterial.apply();
-        this.abdomen.display();
-        this.scene.popMatrix();
+      // Abdomen
+      this.scene.pushMatrix();
+      this.scene.translate(0, -1.3, -4.5);
+      this.scene.rotate(Math.PI / 4, 1, 0, 0);
+      this.scene.scale(1, 1.5, 1);
+      this.abdomenMaterial.apply();
+      this.abdomen.display();
+      this.scene.popMatrix();
 
-        // Wing Left
-        this.scene.pushMatrix();
-        this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0);
-        this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1)
-        this.wingMaterial.apply();
-        this.wing.displayLeftWings();
-        this.scene.popMatrix();
+      // Wing Left
+      this.scene.pushMatrix();
+      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0); // wing movement 
+      this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1); // wing movement
+      this.wingMaterial.apply();
+      this.wing.displayLeftWings();
+      this.scene.popMatrix();
 
-        // Wing Right
-        this.scene.pushMatrix();
-        this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0);
-        this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1)
-        this.wingMaterial.apply();
-        this.wing.displayRightWings();
-        this.scene.popMatrix();
+      // Wing Right
+      this.scene.pushMatrix();
+      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0); // wing movement
+      this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1) // wing movement
+      this.wingMaterial.apply();
+      this.wing.displayRightWings();
+      this.scene.popMatrix();
 
-        // Stringer
-        this.scene.pushMatrix();
-        this.scene.translate(0, -2.2, -5.55);
-        this.scene.scale(0.2, 0.4, 0.2);
-        this.scene.rotate(-(3*Math.PI / 4), 1, 0, 0);
-        this.stingerMaterial.apply();
-        this.stringer.display();
-        this.scene.popMatrix();
+      // Stringer
+      this.scene.pushMatrix();
+      this.scene.translate(0, -2.2, -5.55);
+      this.scene.scale(0.2, 0.4, 0.2);
+      this.scene.rotate(-(3*Math.PI / 4), 1, 0, 0);
+      this.stingerMaterial.apply();
+      this.stringer.display();
+      this.scene.popMatrix();
 
-        // Mouth Left
-        this.scene.pushMatrix();
-        this.scene.translate(-0.1, -0.7, 1.0);
-        this.scene.rotate(- (5 * Math.PI / 4), 1, 0, 0);
-        this.scene.scale(0.1, 0.6, 0.1);
-        this.mouthMaterial.apply();
-        this.mouth.display();
-        this.scene.popMatrix();
+      // Mouth Left
+      this.scene.pushMatrix();
+      this.scene.translate(-0.1, -0.7, 1.0);
+      this.scene.rotate(- (5 * Math.PI / 4), 1, 0, 0);
+      this.scene.scale(0.1, 0.6, 0.1);
+      this.mouthMaterial.apply();
+      this.mouth.display();
+      this.scene.popMatrix();
 
-        // Mouth Right
-        this.scene.pushMatrix();
-        this.scene.translate(0.1, -0.7, 1.0);
-        this.scene.rotate(- (5 * Math.PI / 4), 1, 0, 0);
-        this.scene.scale(0.1, 0.6, 0.1);
-        this.mouthMaterial.apply();
-        this.mouth.display();
-        this.scene.popMatrix();
+      // Mouth Right
+      this.scene.pushMatrix();
+      this.scene.translate(0.1, -0.7, 1.0);
+      this.scene.rotate(- (5 * Math.PI / 4), 1, 0, 0);
+      this.scene.scale(0.1, 0.6, 0.1);
+      this.mouthMaterial.apply();
+      this.mouth.display();
+      this.scene.popMatrix();
 
-        // Leg Left Front
-        this.scene.pushMatrix();
-        this.scene.translate(1, -0.9, -1.8);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Left Front
+      this.scene.pushMatrix();
+      this.scene.translate(1, -0.9, -1.8);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Leg Left Middle
-        this.scene.pushMatrix();
-        this.scene.translate(1, -0.9, -2.4);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Left Middle
+      this.scene.pushMatrix();
+      this.scene.translate(1, -0.9, -2.4);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Leg Left Back
-        this.scene.pushMatrix();
-        this.scene.translate(1, -0.9, -3);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Left Back
+      this.scene.pushMatrix();
+      this.scene.translate(1, -0.9, -3);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Leg Right Front
-        this.scene.pushMatrix();
-        this.scene.translate(-1, -0.9, -1.8);
-        this.scene.rotate(Math.PI, 0, 1, 0);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Right Front
+      this.scene.pushMatrix();
+      this.scene.translate(-1, -0.9, -1.8);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Leg Right Middle
-        this.scene.pushMatrix();
-        this.scene.translate(-1, -0.9, -2.4);
-        this.scene.rotate(Math.PI, 0, 1, 0);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Right Middle
+      this.scene.pushMatrix();
+      this.scene.translate(-1, -0.9, -2.4);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Leg Right Back
-        this.scene.pushMatrix();
-        this.scene.translate(-1, -0.9, -3);
-        this.scene.rotate(Math.PI, 0, 1, 0);
-        this.scene.scale(1.5, 1.5, 1.5);
-        this.legMaterial.apply();
-        this.leg.displayLeg();
-        this.scene.popMatrix();
+      // Leg Right Back
+      this.scene.pushMatrix();
+      this.scene.translate(-1, -0.9, -3);
+      this.scene.rotate(Math.PI, 0, 1, 0);
+      this.scene.scale(1.5, 1.5, 1.5);
+      this.legMaterial.apply();
+      this.leg.displayLeg();
+      this.scene.popMatrix();
 
-        // Antennae Left
-        this.scene.pushMatrix();
-        this.scene.translate(-0.2, 1, 0.7);
-        this.antennaeMaterial.apply();
-        this.antennae.displayAntannae();
-        this.scene.popMatrix();
+      // Antennae Left
+      this.scene.pushMatrix();
+      this.scene.translate(-0.2, 1, 0.7);
+      this.antennaeMaterial.apply();
+      this.antennae.displayAntannae();
+      this.scene.popMatrix();
 
-        // Antennae Left
-        this.scene.pushMatrix();
-        this.scene.translate(0.2, 1, 0.7);
-        this.antennaeMaterial.apply();
-        this.antennae.displayAntannae();
-        this.scene.popMatrix();
+      // Antennae Left
+      this.scene.pushMatrix();
+      this.scene.translate(0.2, 1, 0.7);
+      this.antennaeMaterial.apply();
+      this.antennae.displayAntannae();
+      this.scene.popMatrix();
 
+    }
+
+    checkKeys(factor) {
+
+      var text = "Keys pressed: ";
+      var keysPressed = false;
+
+      // Check for key codes e.g. in https://keycode.info/
+      if (this.scene.gui.isKeyPressed("KeyW")) {
+        this.accelerate(factor)
+
+        text += " W ";
+        keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyS")) {
+        this.accelerate(-factor)
+
+        text += " S ";
+        keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyA")) {
+        this.turn(factor)
+
+        text += " A ";
+        keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyD")) {
+        this.turn(-factor)
+
+        text += " D ";
+        keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyR")) {
+        this.reset()
+      }
+      if (keysPressed) console.log(text);
     }
 }

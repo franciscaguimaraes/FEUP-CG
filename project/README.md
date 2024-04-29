@@ -21,4 +21,10 @@
 ![Screenshot 6](screenshots/project-t04g02-3b.png)
 
 ### 4. Bee
+#### 4.1. Modeling
 ![Screenshot 7](screenshots/project-t04g02-4.png)
+
+#### 4.3 Movement 
+![Screenshot 8](screenshots/project-t04g02-5.png)
+
+

@@ -25,14 +25,35 @@ export class MyInterface extends CGFinterface {
         this.gui.add(this.scene, 'displayRockSet').name('Display Rock Set');
         this.gui.add(this.scene, 'displayBee').name('Display Bee');
 
-
         //Slider element in GUI
-        this.gui.add(this.scene, 'scaleFactor', 0.1, 5).name('Scale Factor');
+        this.gui.add(this.scene, 'scaleFactor', 0.5, 3).name('Scale Factor');
+        this.gui.add(this.scene, 'speedFactor', 0.1, 3).name('Speed Factor');
 
+        //Folder for garden settings
         const gardenFolder = this.gui.addFolder('Garden Settings');
         gardenFolder.add(this.scene, 'displayGarden').name('Display Garden');
         gardenFolder.add(this.scene, 'gardenNumRows', 1, 8).step(1).name('Rows').onChange(this.scene.updateGardenDimensions.bind(this.scene));
         gardenFolder.add(this.scene, 'gardenNumColumns', 1, 8).step(1).name('Columns').onChange(this.scene.updateGardenDimensions.bind(this.scene));
+
+        this.initKeys();
         return true;
+    }
+
+    initKeys() {
+        this.scene.gui = this;
+        this.processKeyboard = function () {};
+        this.activeKeys = {};
+    }
+
+    processKeyDown(event) {
+        this.activeKeys[event.code] = true;
+    }
+
+    processKeyUp(event) {
+        this.activeKeys[event.code] = false;
+    }
+
+    isKeyPressed(keycode) {
+        return this.activeKeys[keycode] || false;
     }
 }
