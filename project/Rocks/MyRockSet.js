@@ -11,6 +11,9 @@ export class MyRockSet extends CGFobject {
         this.numOfPiles = numOfPiles;
         this.radiusRange = radiusRange; // [minRadius, maxRadius]
         this.scaleRange = scaleRange; // [minScale, maxScale]
+        this.pileXpos = 0;
+        this.pileYpos = 0;
+        this.pileZpos = 0;
 
         this.initBuffers();
     }
@@ -65,6 +68,12 @@ export class MyRockSet extends CGFobject {
                     baseZ - layerRadius * Math.sin(angle)  
                 ];
 
+                if(i==0) {
+                    this.pileXpos = rock.position[0];
+                    this.pileYpos = rock.position[1];
+                    this.pileZpos = rock.position[2];
+                }
+
                 rock.rotation = [
                     Math.random() * Math.PI, 
                     Math.random() * Math.PI, 
@@ -79,7 +88,6 @@ export class MyRockSet extends CGFobject {
                     rocksInCurrentLayer += 5; 
                     rockCount = 0;
                 }
-
             }
         }
 
@@ -127,5 +135,12 @@ export class MyRockSet extends CGFobject {
 
             this.scene.popMatrix();
         });
+
+        if(this.scene.displayHive) {
+            this.scene.pushMatrix();
+            this.scene.translate(this.pileXpos, this.pileYpos+1, this.pileZpos);
+            this.scene.hive.display();
+            this.scene.popMatrix();
+        }
     }
 }

@@ -2,9 +2,12 @@ import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyGarden } from "./Flowers/MyGarden.js";
-import {MyRock} from "./Rocks/MyRock.js";
-import {MyRockSet} from "./Rocks/MyRockSet.js";
-import {MyBee} from "./Bee/MyBee.js";
+import { MyRock } from "./Rocks/MyRock.js";
+import { MyRockSet } from "./Rocks/MyRockSet.js";
+import { MyBee } from "./Bee/MyBee.js";
+import { MyPollen } from "./Hive/MyPollen.js";
+import { MyHive } from "./Hive/MyHive.js";
+
 
 /**
  * MyScene
@@ -38,16 +41,18 @@ export class MyScene extends CGFscene {
 
     // Scene elements
     this.displayAxis = true;
-    this.displayPlane = true;
+    this.displayPlane = false;
     this.scaleFactor = 1;
     this.speedFactor = 0.2;
     this.displayPanorama = true;
-    this.displayGarden = true;
+    this.displayGarden = false;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
     this.displayRock = false;
     this.displayRockSet = true;
-    this.displayBee = true;
+    this.displayBee = false;
+    this.displayPollen = false;
+    this.displayHive = true;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -55,8 +60,10 @@ export class MyScene extends CGFscene {
     this.panorama = new MyPanorama(this, this.textures.panorama);
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
     this.rock = new MyRock(this, 1, 20, 20, this.textures.rock);
+    this.hive = new MyHive(this, this.textures.boxPlane);
     this.rockSet = new MyRockSet(this, 20, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
     this.bee = new MyBee(this, 0, 0, 0);
+    this.pollen = new MyPollen(this, 1, 15, 15, this.textures.pollen); 
   }
 
   loadTextures() {
@@ -65,7 +72,9 @@ export class MyScene extends CGFscene {
       receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
       petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
       stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"],
-      rock: "images/rock.jpg"
+      rock: "images/rock.jpg",
+      pollen: "images/pollen.jpg",
+      boxPlane: "images/wood.jpg"
     };
 
     this.textures = {
@@ -73,7 +82,9 @@ export class MyScene extends CGFscene {
       receptacles: texturePaths.receptacles.map(path => new CGFtexture(this, path)),
       petals: texturePaths.petals.map(path => new CGFtexture(this, path)),
       stems: texturePaths.stems.map(path => new CGFtexture(this, path)),
-      rock: new CGFtexture(this, texturePaths.rock)
+      rock: new CGFtexture(this, texturePaths.rock),
+      pollen: new CGFtexture(this, texturePaths.pollen),
+      boxPlane: new CGFtexture(this, texturePaths.boxPlane)
     };
 
     this.texture = new CGFtexture(this, "images/terrain.jpg");
@@ -131,7 +142,7 @@ export class MyScene extends CGFscene {
 
     if (this.displayGarden){
       this.pushMatrix();
-      this.translate(-30,0,50);
+      //this.translate(-30,0,50);
       this.garden.display();
       this.popMatrix();
     }
@@ -155,5 +166,11 @@ export class MyScene extends CGFscene {
       this.bee.display();
       this.popMatrix();
     }
+
+    /*if(this.displayHive){
+      this.pushMatrix();
+      this.hive.display();
+      this.popMatrix();
+    }*/
   }
 }

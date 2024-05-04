@@ -71,6 +71,15 @@ export class MyGarden extends CGFobject {
                 this.scene.scale(this.randomScaling, this.randomScaling, this.randomScaling);
                 flower.display();
                 this.scene.popMatrix();
+
+                if(this.scene.displayPollen) { 
+                    this.scene.pushMatrix();
+                    this.scene.translate(j * flower.externRadius * 2.2, 0, i * flower.externRadius * 2.2);
+                    this.scene.rotate(flower.flowerAngle + Math.PI/2, 1, 0, 0);
+                    this.scene.scale(0.5,0.5,0.5);
+                    this.scene.pollen.display();
+                    this.scene.popMatrix();
+                }
             }
         }
     }
