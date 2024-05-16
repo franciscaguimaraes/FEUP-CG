@@ -5,8 +5,9 @@ import {MyAntannae} from "./MyAntannae.js";
 import {MyLeg} from "./MyLeg.js";
 import { MyWings } from "./MyWings.js";
 
-export class MyBee extends CGFobject {
+// TODO: XZ PLANE SPEED
 
+export class MyBee extends CGFobject {
     constructor(scene, x, y, z) {
         super(scene);
 
@@ -30,7 +31,19 @@ export class MyBee extends CGFobject {
         this.orientation = 0; // Orientation
         this.scale = 1;
         this.speed = 0;
-                
+
+        // pollen
+        this.carryingPollen = false;
+
+        // Movement for Pollen/Hive
+        this.moveToHiveFlag = false;
+        this.moveToFlowerFlag = false;
+        this.moveToInitialHeightFlag = false;
+        
+        // Flower
+        this.targetFlowerPos = null;
+        this.targetFlower = null;
+        
         this.initMaterials();
     }
 
@@ -80,8 +93,6 @@ export class MyBee extends CGFobject {
     // bee has 2 units of width and 1.6 units of height
     display() {
         this.scene.pushMatrix();
-        this.scene.translate(0, 3, 0);
-        this.scene.scale(0.4, 0.4, 0.4);
         this.scene.translate(0, Math.sin(this.elapsedTime) * 0.5, 0); // oscilation
         this.draw();
         this.scene.popMatrix();
@@ -94,8 +105,19 @@ export class MyBee extends CGFobject {
       this.elapsedTime += delta_t / 1000;
 
       // Update position
-      this.position.x += this.speed * Math.sin(this.orientation);
-      this.position.z += this.speed * Math.cos(this.orientation);
+      if (!this.moveToHiveFlag && !this.moveToFlowerFlag && !this.moveToInitialHeightFlag) {
+        this.position.x += this.speed * Math.sin(this.orientation);
+        this.position.z += this.speed * Math.cos(this.orientation);
+
+      } else if (this.moveToHiveFlag) {
+        this.moveToHive();
+
+      } else if (this.moveToFlowerFlag){
+        this.moveToFlower();
+
+      } else if (this.moveToInitialHeightFlag) {
+        this.moveToInitialHeight();
+      }
     }
 
     turn(v) {
@@ -110,13 +132,28 @@ export class MyBee extends CGFobject {
       this.speed = 0
       this.orientation = 0
       this.position = {x: this.defaultPos.x, y: this.defaultPos.y, z: this.defaultPos.z}
+
+      this.moveToHiveFlag = false;
+      this.moveToFlowerFlag = false;
+      this.moveToInitialHeightFlag = false;
+      this.targetFlowerPos = null;
+      this.targetFlower = null;
     }
 
     draw() {
 
       this.scene.translate(this.position.x, this.position.y, this.position.z);
       this.scene.rotate(this.orientation, 0, 1, 0);
+      this.scene.scale(0.4, 0.4, 0.4);
       this.scene.scale(this.scale, this.scale, this.scale);
+
+      //Polen
+      if(this.carryingPollen){
+        this.scene.pushMatrix();
+        this.scene.translate(1.4, -2.6, -1.8);
+        this.scene.pollen.display();
+        this.scene.popMatrix();
+      }
 
       // Head
       this.scene.pushMatrix();
@@ -164,16 +201,16 @@ export class MyBee extends CGFobject {
 
       // Wing Left
       this.scene.pushMatrix();
-      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0); // wing movement 
-      this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1); // wing movement
+      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.7, 0); // wing movement 
+      this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.7, 0, 0, 1); // wing movement
       this.wingMaterial.apply();
       this.wing.displayLeftWings();
       this.scene.popMatrix();
 
       // Wing Right
       this.scene.pushMatrix();
-      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.5, 0); // wing movement
-      this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.5, 0, 0, 1) // wing movement
+      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.7, 0); // wing movement
+      this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.7, 0, 0, 1) // wing movement
       this.wingMaterial.apply();
       this.wing.displayRightWings();
       this.scene.popMatrix();
@@ -305,6 +342,161 @@ export class MyBee extends CGFobject {
       if (this.scene.gui.isKeyPressed("KeyR")) {
         this.reset()
       }
+      if (this.scene.gui.isKeyPressed("KeyF")) {
+        this.descendToFlower();
+
+        text += " F ";
+        keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyP")) {
+          this.ascendWithPollen();
+
+          text += " P ";
+          keysPressed = true;
+      }
+      if (this.scene.gui.isKeyPressed("KeyO")) {
+          this.startMovingToHive();
+
+          text += " O ";
+          keysPressed = true;
+      }
       if (keysPressed) console.log(text);
+    }
+
+    descendToFlower() {
+      if (!this.moveToFlowerFlag && !this.carryingPollen) {
+          const flowerWithPollen = this.scene.garden.flowerAndPosition.filter(fp => fp.flower.hasPollen);
+
+          if (flowerWithPollen.length > 0) {
+
+            const randomIndex = Math.floor(Math.random() * flowerWithPollen.length);
+            
+            this.targetFlowerPos = flowerWithPollen[randomIndex].position;
+            this.targetFlower = flowerWithPollen[randomIndex].flower;
+
+            this.moveToFlowerFlag = true;
+            this.moveToInitialHeightFlag = false;
+            
+          }
+      }
+    }
+
+    moveToFlower() {
+      if (!this.targetFlowerPos) return;
+
+        const hoverOffset = 2;
+
+        const dx = this.targetFlowerPos.x - this.position.x;
+        const dy = (this.targetFlowerPos.y + hoverOffset) - this.position.y;
+        const dz = this.targetFlowerPos.z - this.position.z;
+
+        const distance = Math.sqrt(dx * dx + dz * dz + dy * dy);
+
+        const fastThreshold = 2.0; // Distance threshold to switch to precise movement
+        const stopThreshold = 0.2; // Final stopping threshold
+
+        if (distance > fastThreshold) {
+            this.position.x += (dx / distance) * 0.5; 
+            this.position.y += (dy / distance) * 0.5;
+            this.position.z += (dz / distance) * 0.5;
+        } else if (distance > stopThreshold) {
+            this.position.x += (dx / distance) * (0.5 / 5); // Reduce speed for precision
+            this.position.y += (dy / distance) * (0.5 / 5);
+            this.position.z += (dz / distance) * (0.5 / 5);
+        } else {
+            this.moveToFlowerFlag = false;
+            this.targetFlowerPos = null;
+        }
+
+        // Calculate orientation based on movement direction
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+          this.orientation = Math.atan2(dx, dz);
+        }
+    }
+
+    ascendWithPollen() {
+      if (this.targetFlower && this.targetFlower.hasPollen) {
+          this.carryingPollen = true;
+          this.targetFlower.hasPollen = false;
+
+          this.moveToFlowerFlag = false;
+          this.moveToInitialHeightFlag = true;
+      }
+    }
+
+    moveToInitialHeight() {
+        
+        const dx = this.defaultPos.x - this.position.x;
+        const dy = this.defaultPos.y - this.position.y;
+        const dz = this.defaultPos.z - this.position.z;
+
+        const distance = Math.sqrt(dx * dx + dz * dz + dy * dy);
+
+        const fastThreshold = 2.0; // Distance threshold to switch to precise movement
+        const stopThreshold = 0.2; // Final stopping threshold
+
+        if (distance > fastThreshold) {
+            this.position.x += (dx / distance) * 0.5; 
+            this.position.y += (dy / distance) * 0.5;
+            this.position.z += (dz / distance) * 0.5;
+        } else if (distance > stopThreshold) {
+            this.position.x += (dx / distance) * (0.5 / 5); // Reduce speed for precision
+            this.position.y += (dy / distance) * (0.5 / 5);
+            this.position.z += (dz / distance) * (0.5 / 5);
+        } else {
+              this.moveToInitialHeightFlag = false;
+          }
+
+          // Calculate orientation based on movement direction
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+          this.orientation = Math.atan2(dx, dz);
+        }
+      
+    }
+
+    startMovingToHive() {
+      if (this.carryingPollen) {
+        this.moveToHiveFlag = true;
+      }
+    }
+
+    moveToHive() {
+        const hivePosition = this.scene.hive.position;
+
+        const hiveOffset = 3;
+        
+        const dx = hivePosition.x - this.position.x;
+        const dy = (hivePosition.y + hiveOffset) - this.position.y;
+        const dz = hivePosition.z - this.position.z;
+
+        const distance = Math.sqrt(dx * dx + dz * dz + dy * dy);
+
+        const fastThreshold = 2.0; // Distance threshold to switch to precise movement
+        const stopThreshold = 0.2; // Final stopping threshold
+
+        if (distance > fastThreshold) {
+            this.position.x += (dx / distance) * 0.5; 
+            this.position.y += (dy / distance) * 0.5;
+            this.position.z += (dz / distance) * 0.5;
+        } else if (distance > stopThreshold) {
+            this.position.x += (dx / distance) * (0.5 / 5); // Reduce speed for precision
+            this.position.y += (dy / distance) * (0.5 / 5);
+            this.position.z += (dz / distance) * (0.5 / 5);
+        } else {
+            this.dropPollen();
+            this.moveToHiveFlag = false;
+        }
+
+        // Calculate orientation based on movement direction
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+          this.orientation = Math.atan2(dx, dz);
+        }
+    }
+
+    dropPollen() {
+        if (this.carryingPollen) {
+            this.scene.hive.addPollen(this.scene.pollen); // Add pollen to hive
+            this.carryingPollen = false;
+        }
     }
 }

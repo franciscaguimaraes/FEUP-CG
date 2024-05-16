@@ -41,17 +41,16 @@ export class MyScene extends CGFscene {
 
     // Scene elements
     this.displayAxis = true;
-    this.displayPlane = false;
+    this.displayPlane = true;
     this.scaleFactor = 1;
     this.speedFactor = 0.2;
     this.displayPanorama = true;
-    this.displayGarden = false;
+    this.displayGarden = true;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
-    this.displayRock = false;
     this.displayRockSet = true;
-    this.displayBee = false;
-    this.displayPollen = false;
+    this.displayBee = true;
+    this.displayPollen = true;
     this.displayHive = true;
 
     // Initialize scene objects
@@ -59,10 +58,9 @@ export class MyScene extends CGFscene {
     this.plane = new MyPlane(this, 30);
     this.panorama = new MyPanorama(this, this.textures.panorama);
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
-    this.rock = new MyRock(this, 1, 20, 20, this.textures.rock);
     this.hive = new MyHive(this, this.textures.boxPlane);
     this.rockSet = new MyRockSet(this, 20, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
-    this.bee = new MyBee(this, 0, 0, 0);
+    this.bee = new MyBee(this, 0, 4, 0);
     this.pollen = new MyPollen(this, 1, 15, 15, this.textures.pollen); 
   }
 
@@ -103,7 +101,7 @@ export class MyScene extends CGFscene {
   initCameras() {
     this.camera = new CGFcamera(
       0.9, 0.5, 1000,
-      vec3.fromValues(20, 20, 15),
+      vec3.fromValues(20, 30, 30),
       vec3.fromValues(0, 0, 0)
     );
   }
@@ -142,20 +140,12 @@ export class MyScene extends CGFscene {
 
     if (this.displayGarden){
       this.pushMatrix();
-      //this.translate(-30,0,50);
       this.garden.display();
-      this.popMatrix();
-    }
-
-    if(this.displayRock){
-      this.pushMatrix();
-      this.rock.display();
       this.popMatrix();
     }
 
     if(this.displayRockSet){
       this.pushMatrix();
-      this.translate(20,0,0);
       this.rockSet.display();
       this.popMatrix();
     }
@@ -166,11 +156,5 @@ export class MyScene extends CGFscene {
       this.bee.display();
       this.popMatrix();
     }
-
-    /*if(this.displayHive){
-      this.pushMatrix();
-      this.hive.display();
-      this.popMatrix();
-    }*/
   }
 }

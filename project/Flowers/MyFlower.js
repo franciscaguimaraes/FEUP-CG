@@ -17,6 +17,7 @@ export class MyFlower extends CGFobject {
         this.petalTexture = petalTexture;
         this.stemTexture = stemTexture;
         this.flowerAngle = flowerAngle;
+        this.hasPollen = true;
 
         this.stemMaterial = new CGFappearance(scene);
         this.stemMaterial.setEmission(1, 1, 1, 1);

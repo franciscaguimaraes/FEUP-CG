@@ -50,16 +50,19 @@ export class MyRockSet extends CGFobject {
             let rockCount = 0;
         
             for (let i = 0; i <= this.numRocksPile; i++) {
-                const radius = this.radiusRange[0] + Math.random() * (this.radiusRange[1] - this.radiusRange[0]);
+
+                var radius = 0;
+                if(i == 0){
+                    radius = 1.1;
+                } else {
+                    radius = this.radiusRange[0] + Math.random() * (this.radiusRange[1] - this.radiusRange[0]);
+                }
+
                 const slices = Math.floor(10 + Math.random() * 16); 
                 const stacks = Math.floor(10 + Math.random() * 16); 
                 
                 const rock = new MyRock(this.scene, radius, slices, stacks, this.texture);
 
-                rock.scaleX = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
-                rock.scaleY = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
-                rock.scaleZ = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
-        
                 const angle = 2 * Math.PI * (rockCount / rocksInCurrentLayer);
                 const layerRadius = 1.5 * currentLayer; 
                 rock.position = [
@@ -72,13 +75,24 @@ export class MyRockSet extends CGFobject {
                     this.pileXpos = rock.position[0];
                     this.pileYpos = rock.position[1];
                     this.pileZpos = rock.position[2];
-                }
 
-                rock.rotation = [
-                    Math.random() * Math.PI, 
-                    Math.random() * Math.PI, 
-                    Math.random() * Math.PI 
-                ];
+                    rock.scaleX = 1;
+                    rock.scaleY = 1;
+                    rock.scaleZ = 1;
+
+                    rock.rotation = [0, 0, 0];
+                    
+                } else {
+                    rock.scaleX = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
+                    rock.scaleY = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
+                    rock.scaleZ = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
+            
+                    rock.rotation = [
+                        Math.random() * Math.PI, 
+                        Math.random() * Math.PI, 
+                        Math.random() * Math.PI 
+                    ];
+                }
                 
                 this.rocks.push(rock);
                 rockCount++;
@@ -138,7 +152,7 @@ export class MyRockSet extends CGFobject {
 
         if(this.scene.displayHive) {
             this.scene.pushMatrix();
-            this.scene.translate(this.pileXpos, this.pileYpos+1, this.pileZpos);
+            this.scene.hive.setPosition(this.pileXpos, this.pileYpos + 0.7, this.pileZpos);
             this.scene.hive.display();
             this.scene.popMatrix();
         }

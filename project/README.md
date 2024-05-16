@@ -27,4 +27,12 @@
 #### 4.3 Movement 
 ![Screenshot 8](screenshots/project-t04g02-5.png)
 
+### 5. Pollen and Hive
+#### Objects
+![Screenshot 9](screenshots/project-t04g02-6a.png)
+![Screenshot 10](screenshots/project-t04g02-6b.png)
+
+#### Picking and Dropping functionality
+![Screenshot 11](screenshots/project-t04g02-6c.png)
+![Screenshot 12](screenshots/project-t04g02-6d.png)
 
