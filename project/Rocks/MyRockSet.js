@@ -43,7 +43,7 @@ export class MyRockSet extends CGFobject {
 
             usedPositions.push({x: baseX, z: baseZ});
 
-            let baseY = -1; // Base height of the pile
+            let baseY = 3; // Base height of the pile
         
             let currentLayer = 0;
             let rocksInCurrentLayer = 1;
@@ -119,7 +119,7 @@ export class MyRockSet extends CGFobject {
     
             rock.position = [
                 Math.random() * 50 - 30,
-                -3, 
+                1, 
                 Math.random() * 50 - 30  
             ];
 

@@ -2,11 +2,11 @@ import { CGFscene, CGFcamera, CGFaxis, CGFappearance, CGFtexture } from "../lib/
 import { MyPlane } from "./MyPlane.js";
 import { MyPanorama } from "./MyPanorama.js";
 import { MyGarden } from "./Flowers/MyGarden.js";
-import { MyRock } from "./Rocks/MyRock.js";
 import { MyRockSet } from "./Rocks/MyRockSet.js";
 import { MyBee } from "./Bee/MyBee.js";
 import { MyPollen } from "./Hive/MyPollen.js";
 import { MyHive } from "./Hive/MyHive.js";
+import { MyGrassField } from "./MyGrassField.js";
 
 
 /**
@@ -16,6 +16,7 @@ import { MyHive } from "./Hive/MyHive.js";
 export class MyScene extends CGFscene {
   constructor() {
     super();
+    this.time = 0; // Add this property to track time
   }
   
   init(application) {
@@ -52,6 +53,7 @@ export class MyScene extends CGFscene {
     this.displayBee = true;
     this.displayPollen = true;
     this.displayHive = true;
+    this.displayGrassField = false;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -60,8 +62,11 @@ export class MyScene extends CGFscene {
     this.garden = new MyGarden(this, this.gardenNumRows, this.gardenNumColumns, this.textures.receptacles, this.textures.petals, this.textures.stems); 
     this.hive = new MyHive(this, this.textures.boxPlane);
     this.rockSet = new MyRockSet(this, 20, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
-    this.bee = new MyBee(this, 0, 4, 0);
+    this.bee = new MyBee(this, 0, 10, 0);
     this.pollen = new MyPollen(this, 1, 15, 15, this.textures.pollen); 
+    this.grassField = new MyGrassField(this, 2000, 50, 50, this.textures.grass);
+
+    this.lastUpdateTime = null; // Add this property to track the last update time
   }
 
   loadTextures() {
@@ -72,7 +77,8 @@ export class MyScene extends CGFscene {
       stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"],
       rock: "images/rock.jpg",
       pollen: "images/pollen.jpg",
-      boxPlane: "images/wood.jpg"
+      boxPlane: "images/wood.jpg",
+      grass: "images/grass.jpg"
     };
 
     this.textures = {
@@ -82,7 +88,8 @@ export class MyScene extends CGFscene {
       stems: texturePaths.stems.map(path => new CGFtexture(this, path)),
       rock: new CGFtexture(this, texturePaths.rock),
       pollen: new CGFtexture(this, texturePaths.pollen),
-      boxPlane: new CGFtexture(this, texturePaths.boxPlane)
+      boxPlane: new CGFtexture(this, texturePaths.boxPlane),
+      grass: new CGFtexture(this, texturePaths.grass)
     };
 
     this.texture = new CGFtexture(this, "images/terrain.jpg");
@@ -118,6 +125,13 @@ export class MyScene extends CGFscene {
   }
 
   display() {
+
+    const now = Date.now();
+    const deltaTime = (this.lastUpdateTime ? (now - this.lastUpdateTime) : 0) / 1000; // Time in seconds
+    this.lastUpdateTime = now;
+
+    this.updateTimeFactor(deltaTime); // Update the time factor with delta time
+
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.updateProjectionMatrix();
@@ -129,7 +143,6 @@ export class MyScene extends CGFscene {
     if(this.displayPlane){
       this.pushMatrix();
       this.appearance.apply();
-      this.translate(0,-4.5,0);
       this.scale(400,400,400);
       this.rotate(-Math.PI/2.0,1,0,0);
       this.plane.display();
@@ -156,5 +169,17 @@ export class MyScene extends CGFscene {
       this.bee.display();
       this.popMatrix();
     }
+
+    if(this.displayGrassField){
+      this.pushMatrix();
+      this.grassField.display();
+      this.popMatrix();
+    }
   }
+
+  updateTimeFactor(deltaTime) {
+    this.time += deltaTime;
+    this.grassField.shader.setUniformsValues({ timeFactor: this.time });
+  }
+
 }

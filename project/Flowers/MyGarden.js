@@ -71,10 +71,13 @@ export class MyGarden extends CGFobject {
             for (let j = 0; j < this.displayCols; j++) {
                 var flower = this.garden[i][j];
                 this.scene.pushMatrix();
-                const position = { x: j * flower.externRadius * 2.2, y: 0, z: i * flower.externRadius * 2.2 };
+
+                const position = { x: j * flower.externRadius * 2.2, y: flower.stemHeight * this.randomScaling , z: i * flower.externRadius * 2.2 };
                 this.flowerAndPosition.push({ flower: flower, position: position });
                 this.scene.translate(position.x, position.y, position.z);
+
                 this.scene.scale(this.randomScaling, this.randomScaling, this.randomScaling);
+
                 flower.display();
                 this.scene.popMatrix();
 
@@ -82,7 +85,7 @@ export class MyGarden extends CGFobject {
                     if (flower.hasPollen) {
                         this.scene.pushMatrix();
                         this.scene.translate(position.x, position.y, position.z);
-                        this.scene.rotate(flower.flowerAngle + Math.PI / 2, 1, 0, 0);
+                        this.scene.rotate(flower.flowerAngle, 0, 1, 0);
                         this.scene.scale(0.5, 0.5, 0.5);
                         this.scene.pollen.display();
                         this.scene.popMatrix();

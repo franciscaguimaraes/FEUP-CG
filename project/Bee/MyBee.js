@@ -43,6 +43,14 @@ export class MyBee extends CGFobject {
         // Flower
         this.targetFlowerPos = null;
         this.targetFlower = null;
+
+        // Parabolic trajectory parameters
+        this.extra = true;
+        this.parabolaStart = null;
+        this.parabolaEnd = null;
+        this.parabolaPeak = null;
+        this.parabolaT = 0; // Parameter to control the position along the parabola
+        this.parabolaDuration = 100; // Duration of the parabolic movement
         
         this.initMaterials();
     }
@@ -201,16 +209,16 @@ export class MyBee extends CGFobject {
 
       // Wing Left
       this.scene.pushMatrix();
-      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.7, 0); // wing movement 
-      this.scene.rotate(Math.sin(this.elapsedTime * 1.7) * 0.7, 0, 0, 1); // wing movement
+      this.scene.translate(0, Math.sin(this.elapsedTime * 5) * 0.7, 0); // wing movement 
+      this.scene.rotate(Math.sin(this.elapsedTime * 5) * 0.7, 0, 0, 1); // wing movement
       this.wingMaterial.apply();
       this.wing.displayLeftWings();
       this.scene.popMatrix();
 
       // Wing Right
       this.scene.pushMatrix();
-      this.scene.translate(0, Math.sin(this.elapsedTime * 1.7) * 0.7, 0); // wing movement
-      this.scene.rotate(-Math.sin(this.elapsedTime * 1.7) * 0.7, 0, 0, 1) // wing movement
+      this.scene.translate(0, Math.sin(this.elapsedTime * 5) * 0.7, 0); // wing movement
+      this.scene.rotate(-Math.sin(this.elapsedTime * 5) * 0.7, 0, 0, 1) // wing movement
       this.wingMaterial.apply();
       this.wing.displayRightWings();
       this.scene.popMatrix();
@@ -376,13 +384,56 @@ export class MyBee extends CGFobject {
 
             this.moveToFlowerFlag = true;
             this.moveToInitialHeightFlag = false;
-            
+
+            if(this.extra){
+
+              this.parabolaStart = { ...this.position };
+              this.parabolaEnd = { x: this.targetFlowerPos.x, y: this.targetFlowerPos.y + 2, z: this.targetFlowerPos.z };
+              this.parabolaPeak = {
+                x: (this.parabolaStart.x + this.parabolaEnd.x) / 2,
+                y: Math.max(this.parabolaStart.y, this.parabolaEnd.y) + 5,
+                z: (this.parabolaStart.z + this.parabolaEnd.z) / 2
+              };
+              this.parabolaT = 0; 
+            }
           }
       }
     }
 
     moveToFlower() {
       if (!this.targetFlowerPos) return;
+
+      if (this.extra) {
+        const t = this.parabolaT / this.parabolaDuration;
+        if (t >= 1) {
+            this.position = { ...this.targetFlowerPos, y: this.targetFlowerPos.y + 2 };
+            this.moveToFlowerFlag = false;
+            this.targetFlowerPos = null;
+            this.parabolaT = 0; // Reset parabola parameter
+            return;
+        }
+
+        // Parabolic interpolation
+        const prevX = this.position.x;
+        const prevY = this.position.y;
+        const prevZ = this.position.z;
+
+        // Parabolic interpolation
+        this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
+        this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
+        this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
+
+        const dx = this.position.x - prevX;
+        const dz = this.position.z - prevZ;
+
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+          this.orientation = Math.atan2(dx, dz);
+        }
+
+        // Increment the parameter
+        this.parabolaT += 1; 
+
+      } else {
 
         const hoverOffset = 2;
 
@@ -412,6 +463,7 @@ export class MyBee extends CGFobject {
         if (dx !== 0 || dz !== 0) { // Prevent division by zero
           this.orientation = Math.atan2(dx, dz);
         }
+      }  
     }
 
     ascendWithPollen() {
@@ -421,11 +473,52 @@ export class MyBee extends CGFobject {
 
           this.moveToFlowerFlag = false;
           this.moveToInitialHeightFlag = true;
+
+          if(this.extra){
+            this.parabolaStart = { ...this.position };
+            this.parabolaEnd = { ...this.defaultPos, y: this.defaultPos.y };
+            this.parabolaPeak = {
+                x: (this.parabolaStart.x + this.parabolaEnd.x) / 2,
+                y: Math.max(this.parabolaStart.y, this.parabolaEnd.y) + 5,
+                z: (this.parabolaStart.z + this.parabolaEnd.z) / 2
+            };
+            this.parabolaT = 0; 
+          }
       }
     }
 
     moveToInitialHeight() {
         
+      if (this.extra) {
+        const t = this.parabolaT / this.parabolaDuration;
+        if (t >= 1) {
+            this.position = { ...this.defaultPos, y: this.defaultPos.y };
+            this.moveToInitialHeightFlag = false;
+            this.parabolaT = 0; // Reset parabola parameter
+            return;
+        }
+    
+        // Parabolic interpolation
+        const prevX = this.position.x;
+        const prevY = this.position.y;
+        const prevZ = this.position.z;
+
+        // Parabolic interpolation
+        this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
+        this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
+        this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
+    
+        const dx = this.position.x - prevX;
+        const dz = this.position.z - prevZ;
+
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+            this.orientation = Math.atan2(dx, dz);
+        }
+
+        // Increment the parameter
+        this.parabolaT += 1; 
+
+      } else {
         const dx = this.defaultPos.x - this.position.x;
         const dy = this.defaultPos.y - this.position.y;
         const dz = this.defaultPos.z - this.position.z;
@@ -451,16 +544,61 @@ export class MyBee extends CGFobject {
         if (dx !== 0 || dz !== 0) { // Prevent division by zero
           this.orientation = Math.atan2(dx, dz);
         }
-      
+      }
     }
 
     startMovingToHive() {
       if (this.carryingPollen) {
         this.moveToHiveFlag = true;
+
+        if(this.extra){
+          this.parabolaStart = { ...this.position };
+          const hivePosition = this.scene.hive.position;
+
+          this.parabolaEnd = { x: hivePosition.x, y: hivePosition.y + 3, z: hivePosition.z };
+          this.parabolaPeak = {
+              x: (this.parabolaStart.x + this.parabolaEnd.x) / 2,
+              y: Math.max(this.parabolaStart.y, this.parabolaEnd.y) + 5,
+              z: (this.parabolaStart.z + this.parabolaEnd.z) / 2
+          };
+
+          this.parabolaT = 0; 
+        }
       }
     }
 
     moveToHive() {
+
+      if (this.extra) {
+        const t = this.parabolaT / this.parabolaDuration;
+        if (t >= 1) {
+            this.position = { ...this.parabolaEnd, y: this.parabolaEnd.y };
+            this.dropPollen();
+            this.moveToHiveFlag = false;
+            this.parabolaT = 0; // Reset parabola parameter
+            return;
+        }
+
+        // Parabolic interpolation
+        const prevX = this.position.x;
+        const prevY = this.position.y;
+        const prevZ = this.position.z;
+    
+        this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
+        this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
+        this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
+
+        const dx = this.position.x - prevX;
+        const dz = this.position.z - prevZ;
+
+        if (dx !== 0 || dz !== 0) { // Prevent division by zero
+            this.orientation = Math.atan2(dx, dz);
+        }
+
+        // Increment the parameter
+        this.parabolaT += 1;
+
+      } else {
         const hivePosition = this.scene.hive.position;
 
         const hiveOffset = 3;
@@ -491,12 +629,13 @@ export class MyBee extends CGFobject {
         if (dx !== 0 || dz !== 0) { // Prevent division by zero
           this.orientation = Math.atan2(dx, dz);
         }
+      }
     }
 
     dropPollen() {
-        if (this.carryingPollen) {
-            this.scene.hive.addPollen(this.scene.pollen); // Add pollen to hive
-            this.carryingPollen = false;
-        }
+      if (this.carryingPollen) {
+          this.scene.hive.addPollen(this.scene.pollen); // Add pollen to hive
+          this.carryingPollen = false;
+      }
     }
 }
