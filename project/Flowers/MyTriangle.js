@@ -5,6 +5,11 @@ import {CGFappearance, CGFobject} from '../../lib/CGF.js';
  * @param scene - Reference to MyScene object
  */
 export class MyTriangle extends CGFobject {
+	/**
+     * @brief Constructor for the MyTriangle class.
+     * @param scene Reference to the scene object
+     * @param texture Texture to be applied to the triangle
+     */
 	constructor(scene, texture) {
 		super(scene);
 		this.texture = texture;
@@ -15,6 +20,9 @@ export class MyTriangle extends CGFobject {
 		this.initBuffers();
 	}
 	
+	 /**
+     * @brief Initializes the buffers for the triangle's vertices, indices, and texture coordinates.
+     */
 	initBuffers() {
 		this.vertices = [
 			-1, 1, 0,
@@ -43,6 +51,9 @@ export class MyTriangle extends CGFobject {
 		this.initGLBuffers();
 	}
 
+	/**
+     * @brief Renders the triangle with the applied texture.
+     */
 	display() {
 		this.stemMaterial.apply();
 		super.display();

@@ -1,6 +1,14 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 
 export class MyPollen extends CGFobject {
+    /**
+     * @brief Constructor for the MyPollen class.
+     * @param scene Reference to the scene object
+     * @param radius Radius of the pollen particle
+     * @param slices Number of horizontal divisions (slices)
+     * @param stacks Number of vertical divisions (stacks)
+     * @param texture Texture to be applied to the pollen
+     */
     constructor(scene, radius, slices, stacks, texture) {
         super(scene);
         this.radius = radius;
@@ -18,6 +26,9 @@ export class MyPollen extends CGFobject {
         this.initBuffers();
     }
 
+    /**
+     * @brief Initializes the buffers for the pollen's vertices, indices, normals, and texture coordinates.
+     */
     initBuffers() {
         this.vertices = [];
         this.indices = [];
@@ -75,6 +86,9 @@ export class MyPollen extends CGFobject {
         this.initGLBuffers();
     }
     
+    /**
+     * @brief Renders the pollen particle with the applied texture.
+     */
     display() {
         this.texture.apply();
         this.scene.scale(0.3,0.3,0.3);

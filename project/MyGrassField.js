@@ -1,7 +1,20 @@
 import { CGFobject, CGFappearance, CGFshader, CGFtexture} from '../lib/CGF.js';
 import { MyGrass } from './MyGrass.js';
 
+/**
+ * @class MyGrassField
+ * @brief Represents a field of grass in a 3D scene.
+ * 
+ */
 export class MyGrassField extends CGFobject {
+    /**
+     * @brief Constructor for the MyGrassField class.
+     * @param scene Reference to the scene object
+     * @param numBlades Number of grass blades
+     * @param width Width of the grass field
+     * @param height Height of the grass field
+     * @param texture Texture to be applied to the grass blades
+     */
     constructor(scene, numBlades, width, height, texture) {
         super(scene);
         this.scene = scene;
@@ -27,6 +40,9 @@ export class MyGrassField extends CGFobject {
         }
     }
 
+    /**
+     * @brief Renders the grass field by displaying each grass blade with the applied texture and shader.
+     */
     display() {
         this.texture.apply();
 

@@ -1,11 +1,26 @@
 import {CGFobject} from '../../lib/CGF.js';
 
+/**
+ * @class MyPetal
+ * @brief Represents a petal in a 3D scene.
+ * 
+ * This class extends the CGFobject class to create a petal with specified 
+ * vertices, texture coordinates, indices, and normals. It initializes the 
+ * buffers required for rendering the petal in a WebGL context.
+ */
 export class MyPetal extends CGFobject {
+	/**
+     * @brief Constructor for the MyPetal class.
+     * @param scene Reference to the scene object
+     */
 	constructor(scene) {
 		super(scene);
 		this.initBuffers();
 	}
-	
+
+	/**
+     * @brief Initializes the buffers for the petal's vertices, indices, normals, and texture coordinates.
+     */
 	initBuffers() {
 		this.vertices = [
 			-2, 0, 0,

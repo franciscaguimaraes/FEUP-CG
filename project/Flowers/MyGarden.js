@@ -2,6 +2,15 @@ import {CGFobject} from '../../lib/CGF.js';
 import { MyFlower } from './MyFlower.js';
 
 export class MyGarden extends CGFobject {
+    /**
+     * @brief Constructor for the MyGarden class.
+     * @param scene Reference to the scene object
+     * @param displayRows Number of rows of flowers to display
+     * @param displayCols Number of columns of flowers to display
+     * @param texturesReceptacle Array of textures for the receptacle
+     * @param texturesPetal Array of textures for the petals
+     * @param texturesStem Array of textures for the stem
+     */
     constructor(scene, displayRows, displayCols, texturesReceptacle, texturesPetal, texturesStem) {
         super(scene);
         this.scene = scene;
@@ -19,6 +28,12 @@ export class MyGarden extends CGFobject {
         this.flowerAndPosition = [];
     }
 
+    /**
+     * @brief Creates a garden with a grid of randomly generated flowers.
+     * @param numRows Number of rows in the garden grid
+     * @param numCols Number of columns in the garden grid
+     * @return A 2D array representing the garden with flowers
+     */
     createGarden(numRows, numCols) {
         for (let i = 0; i < numRows; i++) {
             let flowerRow = [];
@@ -57,12 +72,20 @@ export class MyGarden extends CGFobject {
         return this.garden;
     }
 
+    /**
+     * @brief Sets the number of rows and columns of flowers to display.
+     * @param rows Number of rows to display
+     * @param columns Number of columns to display
+     */
     setDisplayDimensions(rows, columns) {
         this.displayRows = rows;
         this.displayCols = columns;
         this.createGarden(this.numRows, this.numCols);
     }
 
+    /**
+     * @brief Renders the garden by displaying the flowers in a grid.
+     */
     display() {
         
         this.flowerAndPosition = []; 

@@ -3,6 +3,11 @@ import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 import { MyBoxPlane } from './MyBoxPlane.js';
 
 export class MyHive extends CGFobject {
+    /**
+     * @brief Constructor for the MyHive class.
+     * @param scene Reference to the scene object
+     * @param texture Texture to be applied to the hive
+     */
     constructor(scene, texture) {
         super(scene);
         this.scene = scene;
@@ -22,12 +27,22 @@ export class MyHive extends CGFobject {
         this.pollenInHive = [];
     }
 
+    /**
+     * @brief Sets the position of the hive.
+     * @param x X-coordinate of the hive's position
+     * @param y Y-coordinate of the hive's position
+     * @param z Z-coordinate of the hive's position
+     */
     setPosition(x, y, z) {
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
     }
 
+    /**
+     * @brief Adds a pollen object to the hive.
+     * @param pollen Pollen object to be added
+     */
     addPollen(pollen) {
         const width = 2;  // Approximate width of the hive
         const height = 3;  // Approximate height where pollen can be placed
@@ -41,11 +56,12 @@ export class MyHive extends CGFobject {
         this.pollenInHive.push({ pollen: pollen, position: pollenPosition });
     }
 
+    /**
+     * @brief Renders the hive and its pollen objects.
+     */
     display() {
         this.scene.pushMatrix();
         this.scene.translate(this.position.x, this.position.y, this.position.z);
-
-        // Display the hive
 
         // Bottom
         this.scene.pushMatrix();
@@ -68,6 +84,9 @@ export class MyHive extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @brief Renders the sides and top of the hive.
+     */
     displayHiveSides() {
         // Front
         this.scene.pushMatrix();
@@ -105,6 +124,9 @@ export class MyHive extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @brief Renders the top box of the hive.
+     */
     drawTopBox() {
         this.scene.pushMatrix();
         this.scene.rotate(Math.PI / 2, 1, 0, 0);

@@ -43,6 +43,12 @@ export class MyCylinder extends CGFobject {
         this.initGLBuffers();
     }
 
+    /**
+     * @brief Creates the vertices, normals, and texture coordinates for the cylinder's surface.
+     * @param angleStep Step in radians for each slice
+     * @param heightStep Step in height for each stack
+     * @param normalDirection Direction of the normals (1 for outer surface, -1 for inner surface)
+     */
     createSurfaceVertices(angleStep, heightStep, normalDirection) {
         for (let stackIndex = 0; stackIndex <= this.stacks; stackIndex++) {
             let z = stackIndex * heightStep;
@@ -57,6 +63,10 @@ export class MyCylinder extends CGFobject {
         }
     }
 
+    
+    /**
+     * @brief Creates the indices for the cylinder's mesh.
+     */
     createMeshIndices() {
         let verticesPerLayer = this.slices + 1;
 
@@ -68,6 +78,12 @@ export class MyCylinder extends CGFobject {
         this.createSurfaceIndices(innerOffset, true, verticesPerLayer);
     }
 
+    /**
+     * @brief Creates the indices for the surface of the cylinder.
+     * @param offset Offset for the vertex indices (used for inner surface)
+     * @param reverse If true, reverses the order of indices (for inner surface)
+     * @param verticesPerLayer Number of vertices per layer (stack) of the cylinder
+     */
     createSurfaceIndices(offset, reverse = false, verticesPerLayer) {
         for (let i = 0; i < this.stacks; i++) {
             for (let j = 0; j < this.slices; j++) {

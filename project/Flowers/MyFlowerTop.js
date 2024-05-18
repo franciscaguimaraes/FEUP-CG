@@ -5,6 +5,17 @@ import { MyReceptacle } from './MyReceptacle.js';
 
 
 export class MyFlowerTop extends CGFobject {
+    /**
+     * @brief Constructor for the MyFlowerTop class.
+     * @param scene Reference to the scene object
+     * @param externRadius External radius of the petals
+     * @param nrPetals Number of petals
+     * @param petalAngle Angle of each petal
+     * @param receptacleRadius Radius of the receptacle (center of the flower top)
+     * @param receptacleSlices Number of slices for the receptacle
+     * @param receptacleTexture Texture for the receptacle
+     * @param petalTexture Texture for the petals
+     */
     constructor(scene, externRadius, nrPetals, petalAngle, receptacleRadius, receptacleSlices, receptacleTexture, petalTexture){
         super(scene);
         this.externRadius = externRadius;
@@ -26,11 +37,17 @@ export class MyFlowerTop extends CGFobject {
         this.initBuffers();
     }
 
+    /**
+     * @brief Initializes the buffers for the receptacle and petals.
+     */
     initBuffers(){
         this.receptacle = new MyReceptacle(this.scene, this.receptacleRadius, this.receptacleSlices);
         this.petal = new MyPetal(this.scene, this.externRadius, this.petalAngle);
     }
 
+    /**
+     * @brief Renders the flower top by displaying the receptacle and petals.
+     */
     display(){
         this.scene.pushMatrix();
         this.receptacleMaterial.apply();

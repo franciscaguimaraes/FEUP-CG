@@ -1,12 +1,25 @@
 import { CGFobject } from '../lib/CGF.js';
 
+/**
+ * @class MyGrass
+ * @brief Represents a blade of grass in a 3D scene.
+ * 
+ */
 export class MyGrass extends CGFobject {
+
+    /**
+     * @brief Constructor for the MyGrass class.
+     * @param scene Reference to the scene object
+     */
     constructor(scene) {
         super(scene);
 
         this.initBuffers();
     }
 
+    /**
+     * @brief Initializes the buffers for the grass blade's vertices, indices, normals, and texture coordinates.
+     */
     initBuffers() {
         const bladeHeight = 1.0;
         const bladeWidth = 0.1;

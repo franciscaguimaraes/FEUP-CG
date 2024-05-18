@@ -1,6 +1,14 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 
 export class MyBoxPlane extends CGFobject {
+	/**
+     * @brief Constructor for the MyBoxPlane class.
+     * @param scene Reference to the scene object
+     * @param width Width of the box
+     * @param height Height of the box
+     * @param depth Depth of the box
+     * @param texture Texture to be applied to the box
+     */
 	constructor(scene, width, height, depth, texture) {
 		super(scene);
 		this.width = width || 1;
@@ -14,6 +22,9 @@ export class MyBoxPlane extends CGFobject {
 		this.initBuffers();
 	}
 
+	/**
+     * @brief Initializes the buffers for the box's vertices, indices, normals, and texture coordinates.
+     */
 	initBuffers() {
 		this.vertices = [
 			// Front face
@@ -119,6 +130,9 @@ export class MyBoxPlane extends CGFobject {
 		this.initGLBuffers();
 	}
 
+	/**
+     * @brief Renders the box with the applied texture.
+     */
     display() {
         this.texture.apply();
         super.display();
