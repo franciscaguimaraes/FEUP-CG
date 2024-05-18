@@ -1,4 +1,4 @@
-import { CGFobject, CGFappearance, CGFshader } from '../lib/CGF.js';
+import { CGFobject } from '../lib/CGF.js';
 
 export class MyGrass extends CGFobject {
     constructor(scene) {
@@ -8,27 +8,42 @@ export class MyGrass extends CGFobject {
     }
 
     initBuffers() {
-        this.vertices = [
-            -0.05, 0, 0,
-            0.05, 0, 0,
-            0, 1, 0
-        ];
+        const bladeHeight = 1.0;
+        const bladeWidth = 0.1;
+        const subdivisions = 3;
+        const vertices = [];
+        const normals = [];
+        const indices = [];
+        const texCoords = [];
 
-        this.normals = [
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1
-        ];
+        // Generate vertices and normals
+        for (let i = 0; i <= subdivisions; i++) {
+            const y = (i / subdivisions) * bladeHeight;
+            const width = bladeWidth * (1 - i / subdivisions);
+            const xLeft = -width / 2;
+            const xRight = width / 2;
 
-        this.indices = [
-            0, 1, 2
-        ];
+            vertices.push(xLeft, y, 0);
+            vertices.push(xRight, y, 0);
 
-        this.texCoords = [
-            0, 0,
-            1, 0,
-            0.5, 1
-        ];
+            normals.push(0, 0, 1);
+            normals.push(0, 0, 1);
+
+            texCoords.push(0, y / bladeHeight);
+            texCoords.push(1, y / bladeHeight);
+        }
+
+        // Generate indices
+        for (let i = 0; i < subdivisions; i++) {
+            const offset = i * 2;
+            indices.push(offset, offset + 1, offset + 2);
+            indices.push(offset + 1, offset + 3, offset + 2);
+        }
+
+        this.vertices = vertices;
+        this.normals = normals;
+        this.indices = indices;
+        this.texCoords = texCoords;
 
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();

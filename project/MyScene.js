@@ -8,15 +8,10 @@ import { MyPollen } from "./Hive/MyPollen.js";
 import { MyHive } from "./Hive/MyHive.js";
 import { MyGrassField } from "./MyGrassField.js";
 
-
-/**
- * MyScene
- * @constructor
- */
 export class MyScene extends CGFscene {
   constructor() {
     super();
-    this.time = 0; // Add this property to track time
+    this.time = 0;
   }
   
   init(application) {
@@ -46,14 +41,14 @@ export class MyScene extends CGFscene {
     this.scaleFactor = 1;
     this.speedFactor = 0.2;
     this.displayPanorama = true;
-    this.displayGarden = true;
+    this.displayGarden = false;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
-    this.displayRockSet = true;
-    this.displayBee = true;
-    this.displayPollen = true;
-    this.displayHive = true;
-    this.displayGrassField = false;
+    this.displayRockSet = false;
+    this.displayBee = false;
+    this.displayPollen = false;
+    this.displayHive = false;
+    this.displayGrassField = true;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -64,9 +59,9 @@ export class MyScene extends CGFscene {
     this.rockSet = new MyRockSet(this, 20, this.textures.rock, 16, 3, [1,1.1], [0.8,1.7]);
     this.bee = new MyBee(this, 0, 10, 0);
     this.pollen = new MyPollen(this, 1, 15, 15, this.textures.pollen); 
-    this.grassField = new MyGrassField(this, 2000, 50, 50, this.textures.grass);
+    this.grassField = new MyGrassField(this, 5000, 50, 50, this.textures.grass);
 
-    this.lastUpdateTime = null; // Add this property to track the last update time
+    this.lastUpdateTime = null;
   }
 
   loadTextures() {
@@ -115,7 +110,7 @@ export class MyScene extends CGFscene {
 
   updateGardenDimensions(){
     this.garden.setDisplayDimensions(this.gardenNumRows, this.gardenNumColumns);
-}
+  }
 
   setDefaultAppearance() {
     this.setAmbient(0.2, 0.4, 0.8, 1.0);
@@ -125,12 +120,11 @@ export class MyScene extends CGFscene {
   }
 
   display() {
-
     const now = Date.now();
-    const deltaTime = (this.lastUpdateTime ? (now - this.lastUpdateTime) : 0) / 1000; // Time in seconds
+    const deltaTime = (this.lastUpdateTime ? (now - this.lastUpdateTime) : 0) / 1000;
     this.lastUpdateTime = now;
 
-    this.updateTimeFactor(deltaTime); // Update the time factor with delta time
+    this.updateTimeFactor(deltaTime);
 
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -181,5 +175,4 @@ export class MyScene extends CGFscene {
     this.time += deltaTime;
     this.grassField.shader.setUniformsValues({ timeFactor: this.time });
   }
-
 }

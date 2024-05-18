@@ -15,7 +15,7 @@ export class MyGrassField extends CGFobject {
         this.texture.setTexture(texture);
 
         this.shader = new CGFshader(scene.gl, "shaders/grass.vert", "shaders/grass.frag");
-        this.shader.setUniformsValues({waveIntensity: 1, waveFrequency: 2.0, timeFactor: 0});
+        this.shader.setUniformsValues({waveIntensity: 0.3, waveFrequency: 1.7, timeFactor: 0});
 
         for (let i = 0; i < numBlades; i++) {
             let blade = new MyGrass(scene);

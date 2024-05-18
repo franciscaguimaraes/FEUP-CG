@@ -36,3 +36,5 @@
 ![Screenshot 11](screenshots/project-t04g02-6c.png)
 ![Screenshot 12](screenshots/project-t04g02-6d.png)
 
+#### Shaders and animation
+![Screenshot 13](screenshots/project-t04g02-7.png)
