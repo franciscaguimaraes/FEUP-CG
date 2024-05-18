@@ -41,14 +41,14 @@ export class MyScene extends CGFscene {
     this.scaleFactor = 1;
     this.speedFactor = 0.2;
     this.displayPanorama = true;
-    this.displayGarden = false;
+    this.displayGarden = true;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
     this.displayRockSet = false;
-    this.displayBee = false;
-    this.displayPollen = false;
+    this.displayBee = true;
+    this.displayPollen = true;
     this.displayHive = false;
-    this.displayGrassField = true;
+    this.displayGrassField = false;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -62,6 +62,9 @@ export class MyScene extends CGFscene {
     this.grassField = new MyGrassField(this, 5000, 50, 50, this.textures.grass);
 
     this.lastUpdateTime = null;
+
+    this.setUpdatePeriod(1000 / 60);
+    this.lastBeeUpdate = new Date().getTime();
   }
 
   loadTextures() {
@@ -159,7 +162,6 @@ export class MyScene extends CGFscene {
 
     if(this.displayBee){
       this.pushMatrix();
-      this.bee.update(100, this.scaleFactor, this.speedFactor);
       this.bee.display();
       this.popMatrix();
     }
@@ -174,5 +176,11 @@ export class MyScene extends CGFscene {
   updateTimeFactor(deltaTime) {
     this.time += deltaTime;
     this.grassField.shader.setUniformsValues({ timeFactor: this.time });
+  }
+
+  update(t) {
+    let deltaTime = t - this.lastBeeUpdate;
+    this.bee.update(deltaTime, this.scaleFactor, this.speedFactor);
+    this.lastBeeUpdate = t;
   }
 }
