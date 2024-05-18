@@ -57,6 +57,7 @@ export class MyFlower extends CGFobject {
     display(){
         this.scene.pushMatrix();
         this.scene.rotate(this.flowerAngle, 1, 0, 0);
+        this.flowerTop.pollen = this.hasPollen;
         this.flowerTop.display();
         this.scene.popMatrix();
 

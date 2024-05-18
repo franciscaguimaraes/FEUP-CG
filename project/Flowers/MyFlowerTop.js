@@ -1,5 +1,7 @@
 import { CGFobject } from '../../lib/CGF.js';
 import { CGFappearance } from '../../lib/CGF.js';
+import { MyCylinder } from './MyCylinder.js';
+import { MySphere } from '../MySphere.js';
 import { MyPetal } from './MyPetal.js';
 import { MyReceptacle } from './MyReceptacle.js';
 
@@ -25,6 +27,7 @@ export class MyFlowerTop extends CGFobject {
         this.receptacleSlices = receptacleSlices;
         this.petalTexture = petalTexture;
         this.receptacleTexture = receptacleTexture;
+        this.pollen = true;
 
         this.receptacleMaterial = new CGFappearance(scene);
         this.receptacleMaterial.setEmission(1, 1, 1, 1);
@@ -41,16 +44,17 @@ export class MyFlowerTop extends CGFobject {
      * @brief Initializes the buffers for the receptacle and petals.
      */
     initBuffers(){
-        this.receptacle = new MyReceptacle(this.scene, this.receptacleRadius, this.receptacleSlices);
+        this.receptacle = new MySphere(this.scene, this.receptacleRadius, 15, this.receptacleSlices);
         this.petal = new MyPetal(this.scene, this.externRadius, this.petalAngle);
     }
 
     /**
      * @brief Renders the flower top by displaying the receptacle and petals.
      */
-    display(){
+    display() {
         this.scene.pushMatrix();
         this.receptacleMaterial.apply();
+        this.scene.scale(1, 0.1, 1);
         this.scene.rotate(Math.PI / 2, 1, 0, 0);
         this.receptacle.display();
         this.scene.popMatrix();
@@ -63,6 +67,15 @@ export class MyFlowerTop extends CGFobject {
             this.petalMaterial.apply();
             this.petal.display();
             this.scene.popMatrix();
+        }
+
+        if (this.scene.displayPollen) {
+            if (this.pollen) {
+                this.scene.pushMatrix();
+                this.scene.translate(0, 0.25, 0);
+                this.scene.pollen.display();
+                this.scene.popMatrix();
+            }
         }
     }
 }

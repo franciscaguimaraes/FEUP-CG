@@ -41,14 +41,14 @@ export class MyScene extends CGFscene {
     this.scaleFactor = 1;
     this.speedFactor = 0.2;
     this.displayPanorama = true;
-    this.displayGarden = false;
+    this.displayGarden = true;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
     this.displayRockSet = false;
     this.displayBee = false;
-    this.displayPollen = false;
+    this.displayPollen = true;
     this.displayHive = false;
-    this.displayGrassField = true;
+    this.displayGrassField = false;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
