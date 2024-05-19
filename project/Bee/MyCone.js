@@ -1,18 +1,33 @@
 import {CGFobject} from '../../lib/CGF.js';
 /**
-* MyCone
-* @constructor
- * @param scene - Reference to MyScene object
- * @param slices - number of divisions around the Y axis
- * @param stacks - number of divisions along the Y axis
+ * Class MyCone
+ * @extends CGFobject
+ * @brief Represents a cone geometry for 3D rendering.
 */
 export class MyCone extends CGFobject {
+
+    /**
+     * @brief Constructs an instance of the MyCone class.
+     * Initializes the geometry and stores references to scene and parameters.
+     * 
+     * @param scene - The CGFscene to which this object belongs.
+     * @param slices - Number of slices (divisions around the Y axis).
+     * @param stacks - Number of stacks (divisions along the Y axis, not used in current implementation).
+     */
     constructor(scene, slices, stacks) {
         super(scene);
         this.slices = slices;
         this.stacks = stacks;
         this.initBuffers();
     }
+
+    /**
+     * @brief Initializes the buffers for vertex positions, indices, and normals.
+     * 
+     * This method creates the vertex positions, indices for drawing the triangles,
+     * and normals for lighting calculations. It handles the geometry of a cone by
+     * defining vertices around a circle and a single apex point at the top.
+    */
     initBuffers() {
         this.vertices = [];
         this.indices = [];
@@ -35,6 +50,7 @@ export class MyCone extends CGFobject {
         this.primitiveType = this.scene.gl.TRIANGLES;
         this.initGLBuffers();
     }
+    
     /**
      * Called when user interacts with GUI to change object's complexity.
      * @param {integer} complexity - changes number of slices

@@ -3,7 +3,6 @@ import { CGFobject } from '../lib/CGF.js';
 /**
  * @class MyGrass
  * @brief Represents a blade of grass in a 3D scene.
- * 
  */
 export class MyGrass extends CGFobject {
 

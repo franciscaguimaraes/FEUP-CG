@@ -1,12 +1,28 @@
 import {CGFobject} from "../../lib/CGF.js";
 import {MySphere} from "../MySphere.js";
 
+/**
+ * Class MyLeg
+ * @extends CGFobject
+ * @brief Represents a leg of a character or creature in a 3D scene.
+ */
 export class MyLeg extends CGFobject {
+
+    /**
+     * Constructs a MyLeg instance.
+     * Initializes the sphere geometry that will be used to represent leg segments.
+     * 
+     * @param scene - The CGFscene to which this object belongs.
+    */
     constructor(scene) {
         super(scene);
         this.sphere = new MySphere(scene, 1, 15, 15);
     }
 
+    /**
+     * @brief Displays the leg in the scene with three distinct parts.
+     * Each part of the leg is modeled as a scaled and positioned sphere to simulate joints and limbs.
+     */
     displayLeg() { // 3 part leg
 
         // 1st part
