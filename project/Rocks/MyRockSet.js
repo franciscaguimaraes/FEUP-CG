@@ -54,8 +54,8 @@ export class MyRockSet extends CGFobject {
 
             // Ensure each pile has a unique position
             while (!positionIsUnique) {
-                baseX = Math.random() * 30 - 15; 
-                baseZ = Math.random() * 30 - 15;
+                baseX = Math.random() * 80 - 30;  // x between -30 and 50
+                baseZ = Math.random() * 10 - 30;  // z between -30 and -20
 
                 positionIsUnique = true; 
 
@@ -144,10 +144,10 @@ export class MyRockSet extends CGFobject {
             rock.scaleZ = this.scaleRange[0] + Math.random() * (this.scaleRange[1] - this.scaleRange[0]);
     
             rock.position = [
-                Math.random() * 50 - 30,
-                1, 
-                Math.random() * 50 - 30  
-            ];
+                Math.random() * 100 - 50,  // x between -50 and 50
+                1,                         // y is fixed at 1
+                Math.random() * 100 - 50   // z between -50 and 50
+            ];            
 
             rock.rotation = [
                 Math.random() * Math.PI, 

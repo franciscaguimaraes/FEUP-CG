@@ -46,11 +46,11 @@ export class MyScene extends CGFscene {
     this.displayGarden = true;
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
-    this.displayRockSet = false;
+    this.displayRockSet = true;
     this.displayBee = true;
     this.displayPollen = true;
-    this.displayHive = false;
-    this.displayGrassField = false;
+    this.displayHive = true;
+    this.displayGrassField = true;
 
     // Initialize scene objects
     this.axis = new CGFaxis(this);
@@ -191,6 +191,7 @@ export class MyScene extends CGFscene {
 
     if(this.displayGrassField){
       this.pushMatrix();
+      this.translate(25,0,25);
       this.grassField.display();
       this.popMatrix();
     }
