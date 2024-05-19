@@ -41,15 +41,5 @@ export class MyLeg extends CGFobject {
         this.scene.scale(0.07, 0.07, 0.5);
         this.sphere.display();
         this.scene.popMatrix();
-
-        // 3rd part
-        /*this.scene.pushMatrix();
-        this.scene.translate(0.45, -1.15, 0);
-        this.scene.rotate(Math.PI/2, 1, 0, 0);
-        this.scene.translate(0, 0, 0);
-        this.scene.rotate(-(Math.PI/2), 0, 1, 0);
-        this.scene.scale(0.07, 0.07, 0.2);
-        this.sphere.display();
-        this.scene.popMatrix();*/
     }
 }

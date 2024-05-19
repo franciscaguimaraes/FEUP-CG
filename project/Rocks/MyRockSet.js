@@ -8,7 +8,8 @@ import { MyRock } from './MyRock.js';
  */
 export class MyRockSet extends CGFobject {
     /**
-     * Constructor for MyRockSet
+     * @brief Constructs a MyRockSet instance.
+     * 
      * Initializes the set of rocks, managing both random placement and structured piles.
      * Handles the initialization of rock properties and sets up initial positions.
      *
@@ -37,10 +38,9 @@ export class MyRockSet extends CGFobject {
     }
 
     /**
-     * initBuffers
-     * Prepares the rock objects by assigning positions, rotations, and scales.
-     * Handles both randomly distributed rocks and structured rock piles.
-     * Ensures no overlap in rock pile positions and systematically constructs each pile.
+     * @brief Initializes the rock set.
+     * 
+     * Initializes the rock set by creating the specified number of rock piles and random rocks.
      */
     initBuffers() {
 
@@ -162,9 +162,10 @@ export class MyRockSet extends CGFobject {
     }
 
     /**
-     * display
-     * Renders all rocks within the set, applying transformations based on their position, scale, and rotation attributes.
-     * Additionally handles the display of a beehive if applicable.
+     * @brief Displays the rock set.
+     * 
+     * Displays each rock in the set, including the rocks in the piles. 
+     * Also displays the hive if the displayHive flag is set.
     */
     display() {
         this.rocks.forEach(rock => {

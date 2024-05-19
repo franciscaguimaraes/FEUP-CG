@@ -138,6 +138,11 @@ export class MyRock extends CGFobject {
         this.initGLBuffers();
     }
 
+    /**
+     * @brief Displays the rock object.
+     * 
+     * Applies the rock's texture and displays the object.
+    */
     display() {
         this.texture.apply()
         super.display();

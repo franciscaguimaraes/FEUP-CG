@@ -49,9 +49,9 @@ To create a natural and visually appealing pile of rocks, we introduced the MyRo
 
 #### 4.1. Modeling
 
-The MyBee class was developed to model the bee with a simplified animation-style body, suitable for interactive graphics. It incorporates:
-- Head with eyes and a larger abdomen serving as the torso.
-- A pair of semi-transparent wings and two pairs of legs, reducing complexity while maintaining a recognizable form.
+The MyBee class was developed to model the bee. It incorporates:
+- head with eyes, a thorax and adbomen.
+- A pair of semi-transparent wings, a pair of antennae and three pairs of legs.
 
 Each component is textured and colored to represent different parts of the bee’s body effectively, with transparency implemented in the wings to mimic their delicate nature. This transparency is managed through WebGL’s alpha blending functionalities to ensure that the wings are rendered correctly in the scene.
 
@@ -77,21 +77,35 @@ We've created the pollen, with the visual appearance of an egg and an orange tex
 
 ![Screenshot 9](screenshots/project-t04g02-6a.png)
 
-We've also created a beehive where the bee leaves the pollen. The base is made up of 5 rectangles so that it looks like a parallelepiped without the top and a lid with 5 phases. Inside the hive are some pollens.
+We've also created a beehive where the bee leaves the pollen. The base is made up of 5 rectangles so that it looks like a box without the top and a lid with 5 phases. 
 
 ![Screenshot 10](screenshots/project-t04g02-6b.png)
 
 #### Picking and Dropping functionality
 
-In our latest update to the MyBee class, we've implemented an interactive feature that allows the bee to pick up and drop pollen grains. This functionality is controlled through keyboard inputs, simulating the bee's natural behavior of pollen collection and deposition at the hive.
+We've implemented an interactive feature that allows the bee to pick up and drop pollen grains. This functionality is controlled through keyboard inputs, simulating the bee's natural behavior of pollen collection and deposition at the hive.
 
-To enable the bee to collect pollen, users press the "F" key. Upon activation, the bee descends while maintaining its horizontal (XZ) velocity until it makes contact with a flower. At this point, the bee halts its descent and stays at the flower, effectively collecting a pollen grain if one is available. This is achieved by attaching a reference of the pollen grain to the MyBee class, which then becomes responsible for rendering the pollen on the bee's display. Concurrently, the pollen reference is removed from the flower in the scene, ceasing its rendering at the original location.
+We implemented two modes for this movement. The normal mode and the enhanced mode.
+
+(F key) For the normal mode:
+
+- To enable the bee to collect pollen, users press the "F" key. Upon activation, the bee descends while maintaining its horizontal (XZ) velocity until it makes contact with a flower or the floor, if the latter it will bounce back to its original position. At this point, if a flower is found, the bee halts its descent and stays at the flower.
+
+
+
+(F key) For the enhanced mode:
+
+- When users press the "F" key the bee moves to the nearest flower, stopping its velocity and positioning itself right above the flower. 
+
+(P key) For both modes:
+
+- When users press P key the pollen is collected, this is achieved by attaching a reference of the pollen grain to the MyBee class, which then becomes responsible for rendering the pollen on the bee's display. Concurrently, the pollen reference is removed from the flower in the scene, ceasing its rendering at the original location. The bee then resumes its prior movement pattern, now carrying the pollen grain. 
 
 ![Screenshot 11](screenshots/project-t04g02-6c.png)
 
-Once the pollen is collected, pressing the "P" key initiates the bee's ascent back to its original flying altitude. The bee then resumes its prior movement pattern, now carrying the pollen grain. 
+(O key) For both modes: 
 
-If the bee is already in flight with a pollen grain and the "O" key is pressed, it navigates towards the beehive's entrance. Upon arrival, the pollen grain is transferred from the bee to the hive. This involves adding the pollen reference to the hive, which then takes over its rendering. Simultaneously, the reference is removed from the MyBee class, which stops displaying the pollen grain. 
+- If the bee is already in flight with a pollen grain and the "O" key is pressed, it navigates towards the beehive's entrance. Upon arrival, the pollen grain is transferred from the bee to the hive. This involves adding the pollen reference to the hive, which then takes over its rendering. Simultaneously, the reference is removed from the MyBee class, which stops displaying the pollen grain. 
 
 ![Screenshot 12](screenshots/project-t04g02-6d.png)
 
@@ -101,3 +115,13 @@ In our grass implementation, we utilize shaders to dynamically simulate the move
 This snippet calculates the vertex offset by applying a sine wave function, scaled by the grass blade's height and modulated by waveIntensity and waveFrequency, creating a more natural curve movement.
 
 ![Screenshot 13](screenshots/project-t04g02-7.png)
+
+### 7. Additional developments
+
+Of the two alternatives given, we chose to implement a parabola-shaped trajectory for the bee when it descends or ascends from a flower, as well as when it heads towards the hive.
+
+To integrate the parabolic trajectory, we calculated the start, peak, and end points of the path based on the target position and height offset, ensuring a smooth, realistic arc. The bee's position is dynamically updated along this path, combining both vertical and horizontal movement to follow the parabola accurately. This coordination results in the bee descending to flowers, ascending with pollen, and heading towards the hive, enhancing the overall realism of its movement. 
+
+The screenshot below is of the final scene look
+
+![Screenshot 14](screenshots/project-t04g02-8.png)
