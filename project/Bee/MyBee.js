@@ -43,7 +43,7 @@ export class MyBee extends CGFobject {
 
     this.normal = true;
     this.enhanced = false;
-    this.extra = true;
+    this.extra = false;
 
     // Flower
     this.targetFlowerPos = null;
@@ -385,7 +385,6 @@ export class MyBee extends CGFobject {
     if (this.scene.gui.isKeyPressed("KeyP")) {
       
       if(this.normal){
-        console.log("normal")
         this.ascendWithPollenNormal();
       } else if(this.enhanced){
         this.ascendWithPollenEnhanced();
@@ -430,7 +429,20 @@ export class MyBee extends CGFobject {
     }
 
     this.targetFlower = closestFlower;
-    const stopAboveFlower = this.targetFlower && minDistance < 2.0; // Define a threshold for being 'close'
+    const stopAboveFlower = this.targetFlower && minDistance < 1.0; // Define a threshold for being 'close'
+
+    const onFlowerDetected = () => {
+        this.position.x = this.targetFlower.position.x;
+        this.position.z = this.targetFlower.position.z;
+        this.position.y = this.targetFlower.position.y + 2;
+
+        this.moveToFloorFlag = false;
+        this.moveToInitialHeightAltFlag = false;
+        this.ySpeed = 0; // Stop Y speed
+        this.speed = 0; // Stop XZ speed
+        this.parabolaStart = null; // Reset parabolic path
+        this.stopParabola = true; // Stop the parabolic movement
+    };
 
     if (this.moveToFloorFlag) {
         if (this.extra) {
@@ -446,23 +458,16 @@ export class MyBee extends CGFobject {
                 };
 
                 // Prepare parabolic path to the target XZ position at floor height
-                this.prepareParabolicPath({ x: targetXZPosition.x, y: this.floorHeight, z: targetXZPosition.z }, 0);
+                const targetPosition = this.originalSpeed > 0 ? targetXZPosition : { x: this.position.x, y: this.floorHeight, z: this.position.z };
+
+                this.prepareParabolicPath({ x: targetPosition.x, y: this.floorHeight, z: targetPosition.z }, 0);
                 this.stopParabola = false; // Initialize the flag
             }
 
             this.followParabolicPath(() => {
                 if (!this.stopParabola && stopAboveFlower && this.position.y <= this.targetFlower.position.y + 2) {
-                    // If a flower is found, stop above it
-                    this.position.x = this.targetFlower.position.x;
-                    this.position.z = this.targetFlower.position.z;
-                    this.position.y = this.targetFlower.position.y + 2;
-
-                    this.moveToFloorFlag = false;
-                    this.ySpeed = 0; // Stop Y speed
-                    this.speed = 0; // Stop XZ speed
-                    this.parabolaStart = null; // Reset parabolic path
+                    onFlowerDetected();
                 } else if (!this.stopParabola && !stopAboveFlower && this.position.y <= this.floorHeight + 1) {
-                    // Follow parabolic movement until reaching the floor
                     this.position.y = this.floorHeight + 1;
                     this.moveToFloorFlag = false;
                     this.moveToInitialHeightAltFlag = true;
@@ -470,20 +475,7 @@ export class MyBee extends CGFobject {
                     this.speed = this.originalSpeed; // Resume XZ speed
                     this.parabolaStart = null; // Reset parabolic path
                 }
-            }, () => {
-                if (stopAboveFlower) {
-                    // If a flower is found during the parabolic path, stop immediately above it
-                    this.position.x = this.targetFlower.position.x;
-                    this.position.z = this.targetFlower.position.z;
-                    this.position.y = this.targetFlower.position.y + 2;
-
-                    this.moveToFloorFlag = false;
-                    this.ySpeed = 0; // Stop Y speed
-                    this.speed = 0; // Stop XZ speed
-                    this.parabolaStart = null; // Reset parabolic path
-                    this.stopParabola = true; // Stop the parabolic movement
-                }
-            });
+            }, onFlowerDetected);
         } else {
             this.ySpeed += this.yAcceleration; // Acceleration in the downward direction
 
@@ -495,13 +487,7 @@ export class MyBee extends CGFobject {
             this.position.y += this.ySpeed;
 
             if (stopAboveFlower && this.position.y <= this.targetFlower.position.y + 2) {
-                this.position.x = this.targetFlower.position.x;
-                this.position.z = this.targetFlower.position.z;
-                this.position.y = this.targetFlower.position.y + 2;
-
-                this.moveToFloorFlag = false;
-                this.ySpeed = 0; // Stop Y speed
-                this.speed = 0; // Stop XZ speed
+                onFlowerDetected();
             } else if (!stopAboveFlower && this.position.y <= this.floorHeight + 2) {
                 this.position.y = this.floorHeight + 2;
                 this.moveToFloorFlag = false;
@@ -523,27 +509,16 @@ export class MyBee extends CGFobject {
                 };
 
                 // Prepare parabolic path to the target XZ position at initial height
-                this.prepareParabolicPath({ x: targetXZPosition.x, y: this.positionBeforeF.y, z: targetXZPosition.z }, 0);
+                const targetPosition = this.originalSpeed > 0 ? targetXZPosition : { x: this.position.x, y: this.positionBeforeF.y, z: this.position.z };
+
+                this.prepareParabolicPath({ x: targetPosition.x, y: this.positionBeforeF.y, z: targetPosition.z }, 0);
                 this.stopParabola = false; // Initialize the flag
             }
 
             this.followParabolicPath(() => {
                 if (!this.stopParabola && stopAboveFlower) {
-                    // If a flower is found, stop above it
-                    this.position.x = this.targetFlower.position.x;
-                    this.position.z = this.targetFlower.position.z;
-                    this.position.y = this.targetFlower.position.y + 2;
-
-                    this.moveToInitialHeightAltFlag = false;
-                    this.ySpeed = 0; // Stop Y speed
-                    this.speed = 0; // Stop XZ speed
-                    this.parabolaStart = null; // Reset parabolic path
+                    onFlowerDetected();
                 } else {
-                    // Correctly resume XZ movement to the original coordinates
-                    const dx = this.positionBeforeF.x - this.position.x;
-                    const dz = this.positionBeforeF.z - this.position.z;
-                    const distance = Math.sqrt(dx * dx + dz * dz);
-
                     this.position.y = this.positionBeforeF.y;
 
                     this.moveToInitialHeightAltFlag = false;
@@ -551,20 +526,7 @@ export class MyBee extends CGFobject {
                     this.speed = this.originalSpeed; // Resume XZ speed
                     this.parabolaStart = null; // Reset parabolic path
                 }
-            }, () => {
-                if (stopAboveFlower) {
-                    // If a flower is found during the parabolic path, stop immediately above it
-                    this.position.x = this.targetFlower.position.x;
-                    this.position.z = this.targetFlower.position.z;
-                    this.position.y = this.targetFlower.position.y + 2;
-
-                    this.moveToInitialHeightAltFlag = false;
-                    this.ySpeed = 0; // Stop Y speed
-                    this.speed = 0; // Stop XZ speed
-                    this.parabolaStart = null; // Reset parabolic path
-                    this.stopParabola = true; // Stop the parabolic movement
-                }
-            });
+            }, onFlowerDetected);
         } else {
             this.ySpeed += -this.yAcceleration; // Acceleration in the opposite direction
 
@@ -582,23 +544,9 @@ export class MyBee extends CGFobject {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   ascendWithPollenNormal() {
-    if (this.targetFlower && this.targetFlower.flower.hasPollen) {
+    if (this.targetFlower && this.targetFlower.flower.hasPollen && !this.carryingPollen) { 
+      console.log(this.targetFlower.position);
       this.carryingPollen = true;
       this.targetFlower.flower.hasPollen = false;
 
@@ -733,30 +681,68 @@ prepareParabolicPath(targetPosition, heightOffset) {
     this.parabolaT = 0;
 }
 
-followParabolicPath(onComplete) {
-    const t = this.parabolaT / this.parabolaDuration;
-    if (t >= 1) {
-        onComplete();
-        return;
-    }
+followParabolicPath(onComplete, onFlowerDetected = () => {}) {
+  const t = this.parabolaT / this.parabolaDuration;
+  if (t >= 1) {
+      onComplete();
+      return;
+  }
 
-    const prevX = this.position.x;
+  // Calculate the current position along the parabolic path
+  const newPosition = {
+      x: (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x,
+      y: (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y,
+      z: (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z
+  };
+
+  const prevX = this.position.x;
     const prevZ = this.position.z;
 
-    // Parabolic interpolation
-    this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
-    this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
-    this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
+  // Update position
+  this.position.x = newPosition.x;
+  this.position.y = newPosition.y;
+  this.position.z = newPosition.z;
 
+  if(this.enhanced){
     const dx = this.position.x - prevX;
     const dz = this.position.z - prevZ;
 
     if (dx !== 0 || dz !== 0) {
         this.orientation = Math.atan2(dx, dz);
     }
+  }
 
-    this.parabolaT += 1;
+  // Check for flower proximity during the parabolic path
+
+  if(this.normal){
+
+  
+  if (this.targetFlower) {
+      const flowerDistance = Math.sqrt(
+          (this.position.x - this.targetFlower.position.x) ** 2 +
+          (this.position.z - this.targetFlower.position.z) ** 2
+      );
+      const stopAboveFlower = flowerDistance < 2.0 && this.position.y <= this.targetFlower.position.y + 2;
+
+      if (stopAboveFlower) {
+          onFlowerDetected();
+          this.stopParabola = true;
+          return;
+      }
+  }
 }
+
+  // Check if the current step completes the parabolic path
+  if (t >= 1) {
+      onComplete();
+  } else {
+      this.parabolaT += 1;
+  }
+}
+
+
+
+
 
 followLinearPath(targetPosition, heightOffset, onComplete) {
     const hoverOffset = heightOffset;
@@ -776,7 +762,6 @@ followLinearPath(targetPosition, heightOffset, onComplete) {
       speed = this.speed;
     }
 
-    console.log("speed: ", speed)
     if (distance > fastThreshold) {
         this.position.x += (dx / distance) * speed;
         this.position.y += (dy / distance) * speed;
