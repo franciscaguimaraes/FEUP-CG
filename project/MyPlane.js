@@ -1,15 +1,20 @@
 import {CGFobject} from '../lib/CGF.js';
+
 /**
-* MyPlane
-* @constructor
- * @param scene - Reference to MyScene object
- * @param nDivs - number of divisions in both directions of the surface
- * @param minS - minimum texture coordinate in S
- * @param maxS - maximum texture coordinate in S
- * @param minT - minimum texture coordinate in T
- * @param maxT - maximum texture coordinate in T
-*/
+ * Class MyPlane
+ * @extends CGFobject
+ * @brief Represents a plane divided into multiple segments, useful for creating surfaces like terrain or simple geometric planes.
+ */
 export class MyPlane extends CGFobject {
+	/**
+	* This class is responsible for generating a grid-like plane with customizable texture mapping, using a grid of vertices and connecting them with triangle strips for efficient rendering.
+	* @param scene - Reference to MyScene object for drawing.
+	* @param nrDivs - Number of divisions in both the x and y directions, defining the grid's resolution.
+	* @param minS - Minimum s-coordinate for the texture mapping.
+	* @param maxS - Maximum s-coordinate for the texture mapping.
+	* @param minT - Minimum t-coordinate for the texture mapping.
+	* @param maxT - Maximum t-coordinate for the texture mapping.
+	*/
 	constructor(scene, nrDivs, minS, maxS, minT, maxT) {
 		super(scene);
 		// nrDivs = 1 if not provided
@@ -24,6 +29,11 @@ export class MyPlane extends CGFobject {
 		this.w = (this.maxT - this.minT) / this.nrDivs;
 		this.initBuffers();
 	}
+
+	/**
+	 * Initializes the vertex, normal, texture coordinate, and index buffers for the plane.
+	 * Configures geometry for rendering as a triangle strip, which is efficient for planar structures.
+	*/
 	initBuffers() {
 		// Generate vertices, normals, and texCoords
 		this.vertices = [];
@@ -59,15 +69,17 @@ export class MyPlane extends CGFobject {
 		this.initGLBuffers();
 	}
 
+	/**
+	 * Sets the drawing mode of the plane to fill mode, using triangles.
+	*/
 	setFillMode() { 
 		this.primitiveType=this.scene.gl.TRIANGLE_STRIP;
 	}
 
-	setLineMode() 
-	{ 
+	/**
+	 * Sets the drawing mode of the plane to line mode, using lines.
+	 */
+	setLineMode() { 
 		this.primitiveType=this.scene.gl.LINES;
 	};
-
 }
-
-

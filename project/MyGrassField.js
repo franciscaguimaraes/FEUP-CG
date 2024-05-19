@@ -4,7 +4,6 @@ import { MyGrass } from './MyGrass.js';
 /**
  * @class MyGrassField
  * @brief Represents a field of grass in a 3D scene.
- * 
  */
 export class MyGrassField extends CGFobject {
     /**

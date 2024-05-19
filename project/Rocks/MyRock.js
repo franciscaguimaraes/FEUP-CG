@@ -1,6 +1,21 @@
 import { CGFobject, CGFappearance } from '../../lib/CGF.js';
 
+/**
+ * Class MyRock
+ * @extends CGFobject
+ * @brief Represents a textured rock object with a perturbed spherical shape.
+ */
 export class MyRock extends CGFobject {
+    /**
+     * Constructs a MyRock instance.
+     * Initializes and applies a texture to the rock, and sets up the rock's geometry.
+     * 
+     * @param scene - The CGFscene to which this object belongs.
+     * @param radius - Radius of the rock.
+     * @param slices - Number of horizontal slices (like longitude).
+     * @param stacks - Number of vertical stacks (like latitude).
+     * @param texture - Texture image to apply to the rock.
+    */
     constructor(scene, radius, slices, stacks, texture) {
         super(scene);
 
@@ -8,6 +23,7 @@ export class MyRock extends CGFobject {
         this.slices = slices;
         this.stacks = stacks;
         
+        // Set up texture with emission to enhance visibility under various lighting conditions
         this.texture = new CGFappearance(this.scene)
         this.texture.setEmission(0.5,0.5,0.5,1)
         this.texture.setTexture(texture)
@@ -15,6 +31,12 @@ export class MyRock extends CGFobject {
         this.initBuffers();
     }
 
+    /**
+     * @brief Initializes the vertex, index, normal, and texture coordinate buffers for the rock.
+     * 
+     * The geometry is created by perturbing a sphere's vertices and normals to create a rough, irregular surface.
+     * Texture coordinates are mapped according to spherical coordinates.
+    */
     initBuffers() {
         this.vertices = [];
         this.indices = [];

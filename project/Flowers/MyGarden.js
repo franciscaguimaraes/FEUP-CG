@@ -45,9 +45,9 @@ export class MyGarden extends CGFobject {
                 const minHeightStem = 6, maxHeightStem = 10;
                 const minRadiusStem = 0.15, maxRadiusStem = 0.3;
                 const minPetalCount = 6, maxPetalCount = 12;
-                const minAnglePetal = 20, maxAnglePetal = 40;
+                const minAnglePetal = Math.PI/6, maxAnglePetal = Math.PI/4;
                 const minExternRadius = 5, maxExternRadius = 7;
-                const minFlowerAngle = 20, maxFlowerAngle = 80;
+                const minFlowerAngle = 0, maxFlowerAngle = Math.PI/2;
 
                 const radiusReceptacle = Math.random() * (maxReceptacleRadius - minReceptacleRadius) + minReceptacleRadius;
                 const receptacleSlices = Math.floor(Math.random() * (maxReceptacleSlices - minReceptacleSlices) + minReceptacleSlices);
@@ -56,7 +56,7 @@ export class MyGarden extends CGFobject {
                 const heightStem = Math.random() * (maxHeightStem - minHeightStem) + minHeightStem;
                 const radiusStem = Math.random() * (maxRadiusStem - minRadiusStem) + minRadiusStem;
                 const countPetals = Math.floor(Math.random() * (maxPetalCount - minPetalCount) + minPetalCount);
-                const anglePetal = Math.PI / (Math.floor(Math.random() * (maxAnglePetal - minAnglePetal) + minAnglePetal));
+                const anglePetal = Math.random() * (maxAnglePetal - minAnglePetal) + minAnglePetal;
                 const indexTextureReceptacle = Math.floor(Math.random() * this.texturesReceptacle.length);
                 const indexTexturePetal = Math.floor(Math.random() * this.texturesPetal.length);
                 const indexTextureStem = Math.floor(Math.random() * this.texturesStem.length);
@@ -104,16 +104,7 @@ export class MyGarden extends CGFobject {
                 flower.display();
                 this.scene.popMatrix();
 
-                if (this.scene.displayPollen) { // display pollen
-                    if (flower.hasPollen) {
-                        this.scene.pushMatrix();
-                        this.scene.translate(position.x, position.y, position.z);
-                        this.scene.rotate(flower.flowerAngle, 0, 1, 0);
-                        this.scene.scale(0.5, 0.5, 0.5);
-                        this.scene.pollen.display();
-                        this.scene.popMatrix();
-                    }
-                }
+                
             }
         }
     }

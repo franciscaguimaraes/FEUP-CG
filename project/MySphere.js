@@ -1,6 +1,18 @@
 import { CGFobject } from "../lib/CGF.js";
 
+/**
+ * Class MySphere
+ * @extends CGFobject
+ * @brief Represents a sphere that can be used both for normal and panoramic views.
+ */
 export class MySphere extends CGFobject {
+    /**
+    * @param scene - Reference to MyScene object where the sphere will be displayed.
+    * @param radius - Radius of the sphere.
+    * @param slices - Number of horizontal slices (divisions around the sphere).
+    * @param stacks - Number of vertical stacks (divisions from top to bottom of the sphere).
+    * @param panorama - Boolean to indicate if the sphere should be inverted for panoramic rendering.
+    */
     constructor(scene, radius, slices, stacks, panorama = false) {
         super(scene);
         this.radius = radius;
@@ -11,6 +23,10 @@ export class MySphere extends CGFobject {
         this.initBuffers();
     }
 
+    /**
+     * Initializes the buffers for vertices, indices, normals, and texture coordinates.
+     * Depending on the panorama flag, normals are inverted to render the sphere from inside.
+    */
     initBuffers() {
         this.vertices = [];
         this.indices = [];

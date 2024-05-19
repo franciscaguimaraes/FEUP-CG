@@ -69,7 +69,7 @@ export class MyScene extends CGFscene {
 
   loadTextures() {
     const texturePaths = {
-      panorama: "images/panorama_flowers.jpg",
+      panorama: "images/panorama.jpg",
       receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
       petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
       stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"],
@@ -90,9 +90,10 @@ export class MyScene extends CGFscene {
       grass: new CGFtexture(this, texturePaths.grass)
     };
 
-    this.texture = new CGFtexture(this, "images/terrain.jpg");
+    this.texture = new CGFtexture(this, "images/plane_grass.jpg");
     this.appearance = new CGFappearance(this);
     this.appearance.setTexture(this.texture);
+    this.appearance.setEmission(0.2, 0.2, 0.2, 0.2);
     this.appearance.setTextureWrap('REPEAT', 'REPEAT');
    }
 

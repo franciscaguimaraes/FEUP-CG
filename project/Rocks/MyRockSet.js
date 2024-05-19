@@ -1,7 +1,25 @@
 import { CGFobject } from '../../lib/CGF.js';
 import { MyRock } from './MyRock.js'; 
 
+/**
+ * Class MyRockSet
+ * @extends CGFobject
+ * @brief Represents a set of rocks, both randomly placed and organized in piles.
+ */
 export class MyRockSet extends CGFobject {
+    /**
+     * Constructor for MyRockSet
+     * Initializes the set of rocks, managing both random placement and structured piles.
+     * Handles the initialization of rock properties and sets up initial positions.
+     *
+     * @param scene - The scene where the rocks will be displayed.
+     * @param numRocksRandom - The total number of rocks to be placed randomly.
+     * @param texture - The texture to be applied to each rock.
+     * @param numRocksPile - The number of rocks in each pile.
+     * @param numOfPiles - The number of piles to be created.
+     * @param radiusRange - Array [minRadius, maxRadius] for the size of the rocks.
+     * @param scaleRange - Array [minScale, maxScale] for scaling each rock.
+    */
     constructor(scene, numRocksRandom, texture, numRocksPile, numOfPiles, radiusRange, scaleRange) {
         super(scene);
         this.numRocksRandom = numRocksRandom;
@@ -18,15 +36,23 @@ export class MyRockSet extends CGFobject {
         this.initBuffers();
     }
 
+    /**
+     * initBuffers
+     * Prepares the rock objects by assigning positions, rotations, and scales.
+     * Handles both randomly distributed rocks and structured rock piles.
+     * Ensures no overlap in rock pile positions and systematically constructs each pile.
+     */
     initBuffers() {
 
-        let usedPositions = [];
+        let usedPositions = []; // Stores positions to ensure no overlapping of rock piles
 
+        // Constructing rock piles with unique positions
         for (let i = 0; i < this.numOfPiles; i++) {
 
             let baseX, baseZ;
             let positionIsUnique = false;
 
+            // Ensure each pile has a unique position
             while (!positionIsUnique) {
                 baseX = Math.random() * 30 - 15; 
                 baseZ = Math.random() * 30 - 15;
@@ -135,6 +161,11 @@ export class MyRockSet extends CGFobject {
         }
     }
 
+    /**
+     * display
+     * Renders all rocks within the set, applying transformations based on their position, scale, and rotation attributes.
+     * Additionally handles the display of a beehive if applicable.
+    */
     display() {
         this.rocks.forEach(rock => {
             this.scene.pushMatrix();
