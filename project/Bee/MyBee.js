@@ -41,17 +41,28 @@ export class MyBee extends CGFobject {
 
     this.positionBeforeF = { x: 0, y: 0, z: 0 };
 
+    this.normal = true;
+    this.enhanced = false;
+    this.extra = true;
+
     // Flower
     this.targetFlowerPos = null;
     this.targetFlower = null;
 
     // Parabolic trajectory parameters
-    this.extra = true;
     this.parabolaStart = null;
     this.parabolaEnd = null;
     this.parabolaPeak = null;
     this.parabolaT = 0; // Parameter to control the position along the parabola
     this.parabolaDuration = 50; // Duration of the parabolic movement
+
+
+    // common move
+    this.moveToFloorFlag = false;
+    this.moveToInitialHeightAltFlag = false;
+    this.floorHeight = 0;
+    this.ySpeed = 0;
+    this.yAcceleration = -0.01; // downwards acceleration
 
     this.initMaterials();
   }
@@ -116,6 +127,11 @@ export class MyBee extends CGFobject {
 
     this.elapsedTime += delta_t / 1000;
 
+    if(this.moveToFloorFlag || this.moveToInitialHeightAltFlag){
+      this.moveToFlowerNormal();
+    }
+
+
     // Update position
     if (!this.moveToHiveFlag && !this.moveToFlowerFlag && !this.moveToInitialHeightFlag) {
         this.position.x += this.speed * Math.sin(this.orientation);
@@ -147,6 +163,9 @@ export class MyBee extends CGFobject {
     this.moveToInitialHeightFlag = false;
     this.targetFlowerPos = null;
     this.targetFlower = null;
+    this.carryingPollen = false;
+    this.moveToFloorFlag = false;
+    this.moveToInitialHeightAltFlag = false;
   }
 
   draw() {
@@ -352,76 +371,296 @@ export class MyBee extends CGFobject {
       this.reset()
     }
     if (this.scene.gui.isKeyPressed("KeyF")) {
-      this.positionBeforeF = { ...this.position };
-      this.descendToFlower();
+      this.positionBeforeF = { x: this.position.x, y: this.defaultPos.y, z: this.position.z};
+
+      if (this.normal){
+        this.descendToFlowerNormal();
+      } else if(this.enhanced){
+        this.descendToFlowerEnhanced();
+      }
 
       text += " F ";
       keysPressed = true;
     }
     if (this.scene.gui.isKeyPressed("KeyP")) {
-        this.ascendWithPollen();
+      
+      if(this.normal){
+        console.log("normal")
+        this.ascendWithPollenNormal();
+      } else if(this.enhanced){
+        this.ascendWithPollenEnhanced();
+      }
 
-        text += " P ";
-        keysPressed = true;
+      text += " P ";
+      keysPressed = true;
     }
     if (this.scene.gui.isKeyPressed("KeyO")) {
-        this.startMovingToHive();
+      this.startMovingToHive();
 
-        text += " O ";
-        keysPressed = true;
+      text += " O ";
+      keysPressed = true;
     }
     if (keysPressed) console.log(text);
   }
 
-  descendToFlower() {
-      if (!this.moveToFlowerFlag && !this.carryingPollen) {
-        const flowersWithPollen = this.scene.garden.flowerAndPosition.filter(fp => fp.flower.hasPollen);
-
-        if (flowersWithPollen.length > 0) {
-          let minDistance = 1000;
-          let randomIndex = 0;
-
-          // find closest flower distance 
-          for (let i = 0; i < flowersWithPollen.length; i++) {
-            const flower = flowersWithPollen[i];
-            const distance = Math.sqrt((this.position.x - flower.position.x) ** 2 + (this.position.z - flower.position.z) ** 2);
-            if (distance < minDistance) {
-                minDistance = distance;
-                randomIndex = i;
-            }
-          }
-
-          this.targetFlowerPos = flowersWithPollen[randomIndex].position;
-          this.targetFlower = flowersWithPollen[randomIndex].flower;
-
-          this.moveToFlowerFlag = true;
-          this.moveToInitialHeightFlag = false;
-
-          if (this.extra) {
-            this.prepareParabolicPath(this.targetFlowerPos, 2);
-          }
-        }
-      }
-  }
-
-  moveToFlower() {
-    if (!this.targetFlowerPos) return; // No target flower
-
-    if (this.extra) {
-      this.followParabolicPath(() => {
-          this.position = { ...this.targetFlowerPos, y: this.targetFlowerPos.y + 2 };
-          this.moveToFlowerFlag = false;
-          this.targetFlowerPos = null;
-          this.parabolaT = 0; 
-          this.speed = 0; // Stop the bee
-      });
-      
-    } else {
-      this.followLinearPath(this.targetFlowerPos, 2);
+  descendToFlowerNormal() {
+    if (!this.moveToFloorFlag && !this.carryingPollen) {
+      this.moveToFloorFlag = true;
+      this.floorHeight = 0;
+      this.ySpeed = 0; // Reset Y speed
     }
   }
 
-  ascendWithPollen() {
+  moveToFlowerNormal() {
+    const flowersWithPollen = this.scene.garden.flowerAndPosition.filter(fp => fp.flower.hasPollen);
+    let minDistance = Infinity;
+    let closestFlower = null;
+
+    // Check the distance to each flower
+    for (let i = 0; i < flowersWithPollen.length; i++) {
+        const flower = flowersWithPollen[i];
+        const distance = Math.sqrt(
+            (this.position.x - flower.position.x) ** 2 +
+            (this.position.z - flower.position.z) ** 2
+        );
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestFlower = flower;
+        }
+    }
+
+    this.targetFlower = closestFlower;
+    const stopAboveFlower = this.targetFlower && minDistance < 2.0; // Define a threshold for being 'close'
+
+    if (this.moveToFloorFlag) {
+        if (this.extra) {
+            // Ensure no conflicting movements
+            if (!this.parabolaStart) {
+                this.originalSpeed = this.speed;
+                this.speed = 0; // Stop XZ movement when starting parabolic path
+
+                // Calculate the target XZ position based on the original speed and orientation
+                const targetXZPosition = {
+                    x: this.position.x + this.originalSpeed * Math.sin(this.orientation) * this.parabolaDuration,
+                    z: this.position.z + this.originalSpeed * Math.cos(this.orientation) * this.parabolaDuration
+                };
+
+                // Prepare parabolic path to the target XZ position at floor height
+                this.prepareParabolicPath({ x: targetXZPosition.x, y: this.floorHeight, z: targetXZPosition.z }, 0);
+                this.stopParabola = false; // Initialize the flag
+            }
+
+            this.followParabolicPath(() => {
+                if (!this.stopParabola && stopAboveFlower && this.position.y <= this.targetFlower.position.y + 2) {
+                    // If a flower is found, stop above it
+                    this.position.x = this.targetFlower.position.x;
+                    this.position.z = this.targetFlower.position.z;
+                    this.position.y = this.targetFlower.position.y + 2;
+
+                    this.moveToFloorFlag = false;
+                    this.ySpeed = 0; // Stop Y speed
+                    this.speed = 0; // Stop XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                } else if (!this.stopParabola && !stopAboveFlower && this.position.y <= this.floorHeight + 1) {
+                    // Follow parabolic movement until reaching the floor
+                    this.position.y = this.floorHeight + 1;
+                    this.moveToFloorFlag = false;
+                    this.moveToInitialHeightAltFlag = true;
+                    this.ySpeed = -this.ySpeed; // Reverse speed for upward movement
+                    this.speed = this.originalSpeed; // Resume XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                }
+            }, () => {
+                if (stopAboveFlower) {
+                    // If a flower is found during the parabolic path, stop immediately above it
+                    this.position.x = this.targetFlower.position.x;
+                    this.position.z = this.targetFlower.position.z;
+                    this.position.y = this.targetFlower.position.y + 2;
+
+                    this.moveToFloorFlag = false;
+                    this.ySpeed = 0; // Stop Y speed
+                    this.speed = 0; // Stop XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                    this.stopParabola = true; // Stop the parabolic movement
+                }
+            });
+        } else {
+            this.ySpeed += this.yAcceleration; // Acceleration in the downward direction
+
+            if (this.originalSpeed > 0) { // keep same XZ speed
+                this.position.x += this.originalSpeed * Math.sin(this.orientation);
+                this.position.z += this.originalSpeed * Math.cos(this.orientation);
+            }
+
+            this.position.y += this.ySpeed;
+
+            if (stopAboveFlower && this.position.y <= this.targetFlower.position.y + 2) {
+                this.position.x = this.targetFlower.position.x;
+                this.position.z = this.targetFlower.position.z;
+                this.position.y = this.targetFlower.position.y + 2;
+
+                this.moveToFloorFlag = false;
+                this.ySpeed = 0; // Stop Y speed
+                this.speed = 0; // Stop XZ speed
+            } else if (!stopAboveFlower && this.position.y <= this.floorHeight + 2) {
+                this.position.y = this.floorHeight + 2;
+                this.moveToFloorFlag = false;
+                this.moveToInitialHeightAltFlag = true;
+                this.ySpeed = -this.ySpeed; // Reverse speed for upward movement
+            }
+        }
+    } else if (this.moveToInitialHeightAltFlag) {
+        if (this.extra) {
+            // Ensure no conflicting movements
+            if (!this.parabolaStart) {
+                this.originalSpeed = this.speed;
+                this.speed = 0; // Stop XZ movement when starting parabolic path
+
+                // Calculate the target XZ position based on the original speed and orientation
+                const targetXZPosition = {
+                    x: this.position.x + this.originalSpeed * Math.sin(this.orientation) * this.parabolaDuration,
+                    z: this.position.z + this.originalSpeed * Math.cos(this.orientation) * this.parabolaDuration
+                };
+
+                // Prepare parabolic path to the target XZ position at initial height
+                this.prepareParabolicPath({ x: targetXZPosition.x, y: this.positionBeforeF.y, z: targetXZPosition.z }, 0);
+                this.stopParabola = false; // Initialize the flag
+            }
+
+            this.followParabolicPath(() => {
+                if (!this.stopParabola && stopAboveFlower) {
+                    // If a flower is found, stop above it
+                    this.position.x = this.targetFlower.position.x;
+                    this.position.z = this.targetFlower.position.z;
+                    this.position.y = this.targetFlower.position.y + 2;
+
+                    this.moveToInitialHeightAltFlag = false;
+                    this.ySpeed = 0; // Stop Y speed
+                    this.speed = 0; // Stop XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                } else {
+                    // Correctly resume XZ movement to the original coordinates
+                    const dx = this.positionBeforeF.x - this.position.x;
+                    const dz = this.positionBeforeF.z - this.position.z;
+                    const distance = Math.sqrt(dx * dx + dz * dz);
+
+                    this.position.y = this.positionBeforeF.y;
+
+                    this.moveToInitialHeightAltFlag = false;
+                    this.ySpeed = 0; // Stop Y speed
+                    this.speed = this.originalSpeed; // Resume XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                }
+            }, () => {
+                if (stopAboveFlower) {
+                    // If a flower is found during the parabolic path, stop immediately above it
+                    this.position.x = this.targetFlower.position.x;
+                    this.position.z = this.targetFlower.position.z;
+                    this.position.y = this.targetFlower.position.y + 2;
+
+                    this.moveToInitialHeightAltFlag = false;
+                    this.ySpeed = 0; // Stop Y speed
+                    this.speed = 0; // Stop XZ speed
+                    this.parabolaStart = null; // Reset parabolic path
+                    this.stopParabola = true; // Stop the parabolic movement
+                }
+            });
+        } else {
+            this.ySpeed += -this.yAcceleration; // Acceleration in the opposite direction
+
+            if (this.originalSpeed > 0) {
+                this.position.x += this.originalSpeed * Math.sin(this.orientation);
+                this.position.z += this.originalSpeed * Math.cos(this.orientation);
+            }
+            this.position.y += this.ySpeed;
+
+            if (this.position.y >= this.positionBeforeF.y) {
+                this.position.y = this.positionBeforeF.y;
+                this.moveToInitialHeightAltFlag = false;
+                this.ySpeed = 0; // Stop upward movement
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ascendWithPollenNormal() {
+    if (this.targetFlower && this.targetFlower.flower.hasPollen) {
+      this.carryingPollen = true;
+      this.targetFlower.flower.hasPollen = false;
+
+      this.moveToFloorFlag = false;
+      this.moveToInitialHeightAltFlag = true;
+      this.ySpeed = 0; // Reset ySpeed for upward movement
+
+      if (this.extra) {
+        this.prepareParabolicPath({ x: this.position.x, y: this.positionBeforeF.y, z: this.position.z }, 0);
+    }
+    }
+  }
+
+  descendToFlowerEnhanced() {
+    if (!this.moveToFlowerFlag && !this.carryingPollen) {
+      const flowersWithPollen = this.scene.garden.flowerAndPosition.filter(fp => fp.flower.hasPollen);
+
+      if (flowersWithPollen.length > 0) {
+        let minDistance = 1000;
+        let randomIndex = 0;
+
+        // find closest flower distance 
+        for (let i = 0; i < flowersWithPollen.length; i++) {
+          const flower = flowersWithPollen[i];
+          const distance = Math.sqrt((this.position.x - flower.position.x) ** 2 + (this.position.z - flower.position.z) ** 2);
+          if (distance < minDistance) {
+              minDistance = distance;
+              randomIndex = i;
+          }
+        }
+
+        this.targetFlowerPos = flowersWithPollen[randomIndex].position;
+        this.targetFlower = flowersWithPollen[randomIndex].flower;
+
+        this.moveToFlowerFlag = true;
+        this.moveToInitialHeightFlag = false;
+
+        if (this.extra) {
+          this.prepareParabolicPath(this.targetFlowerPos, 2);
+        }
+      }
+    }
+  }
+
+  moveToFlower() {
+      if (!this.targetFlowerPos) return; // No target flower
+
+      if (this.extra) {
+          this.followParabolicPath(() => {
+              this.position = { ...this.targetFlowerPos, y: this.targetFlowerPos.y + 2 };
+              this.moveToFlowerFlag = false;
+              this.targetFlowerPos = null;
+              this.parabolaT = 0; 
+              this.speed = 0; // Stop the bee
+          });
+          
+      } else {
+          this.followLinearPath(this.targetFlowerPos, 2);
+      }
+  }
+
+  ascendWithPollenEnhanced() {
     if (this.targetFlower && this.targetFlower.hasPollen) {
       this.carryingPollen = true;
       this.targetFlower.hasPollen = false;
@@ -436,16 +675,16 @@ export class MyBee extends CGFobject {
   }
 
   moveToInitialHeight() {
-    if (this.extra) {
-        this.followParabolicPath(() => {
-            this.position = { ...this.positionBeforeF, y: this.positionBeforeF.y };
-            this.moveToInitialHeightFlag = false;
-            this.parabolaT = 0; 
-        });
+      if (this.extra) {
+          this.followParabolicPath(() => {
+              this.position = { ...this.positionBeforeF, y: this.positionBeforeF.y };
+              this.moveToInitialHeightFlag = false;
+              this.parabolaT = 0; 
+          });
 
-    } else {
-        this.followLinearPath(this.positionBeforeF, 0);
-    }
+      } else {
+          this.followLinearPath(this.positionBeforeF, 0);
+      }
   }
 
   startMovingToHive() {
@@ -459,99 +698,99 @@ export class MyBee extends CGFobject {
     }
   }
 
-  moveToHive() {
+moveToHive() {
     if (this.extra) {
-      this.followParabolicPath(() => {
-          this.dropPollen();
-          this.moveToHiveFlag = false;
-          this.parabolaT = 0; // Reset parabola parameter
-      });
+        this.followParabolicPath(() => {
+            this.dropPollen();
+            this.moveToHiveFlag = false;
+            this.parabolaT = 0; // Reset parabola parameter
+        });
 
     } else {
-      const hivePosition = this.scene.hive.position;
-      this.followLinearPath(hivePosition, 3, () => {
-          this.dropPollen();
-          this.moveToHiveFlag = false;
-      });
+        const hivePosition = this.scene.hive.position;
+        this.followLinearPath(hivePosition, 3, () => {
+            this.dropPollen();
+            this.moveToHiveFlag = false;
+        });
     }
-  }
+}
 
-  dropPollen() {
+dropPollen() {
     if (this.carryingPollen) {
-      this.scene.hive.addPollen(this.scene.pollen); // Add pollen to hive
-      this.carryingPollen = false;
+        this.scene.hive.addPollen(this.scene.pollen); // Add pollen to hive
+        this.carryingPollen = false;
     }
-  }
+}
 
-  prepareParabolicPath(targetPosition, heightOffset) {
-      this.parabolaStart = { ...this.position };
-      this.parabolaEnd = { ...targetPosition, y: targetPosition.y + heightOffset };
-      this.parabolaPeak = {
-          x: (this.parabolaStart.x + this.parabolaEnd.x) / 2,
-          y: Math.max(this.parabolaStart.y, this.parabolaEnd.y) + 5,
-          z: (this.parabolaStart.z + this.parabolaEnd.z) / 2
-      };
-      this.parabolaT = 0;
-  }
+prepareParabolicPath(targetPosition, heightOffset) {
+    this.parabolaStart = { ...this.position };
+    this.parabolaEnd = { ...targetPosition, y: targetPosition.y + heightOffset };
+    this.parabolaPeak = {
+        x: (this.parabolaStart.x + this.parabolaEnd.x) / 2,
+        y: Math.max(this.parabolaStart.y, this.parabolaEnd.y) + 5,
+        z: (this.parabolaStart.z + this.parabolaEnd.z) / 2
+    };
+    this.parabolaT = 0;
+}
 
-  followParabolicPath(onComplete) {
-      const t = this.parabolaT / this.parabolaDuration;
-      if (t >= 1) {
+followParabolicPath(onComplete) {
+    const t = this.parabolaT / this.parabolaDuration;
+    if (t >= 1) {
         onComplete();
         return;
-      }
+    }
 
-      const prevX = this.position.x;
-      const prevZ = this.position.z;
+    const prevX = this.position.x;
+    const prevZ = this.position.z;
 
-      // Parabolic interpolation
-      this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
-      this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
-      this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
+    // Parabolic interpolation
+    this.position.x = (1 - t) * (1 - t) * this.parabolaStart.x + 2 * (1 - t) * t * this.parabolaPeak.x + t * t * this.parabolaEnd.x;
+    this.position.y = (1 - t) * (1 - t) * this.parabolaStart.y + 2 * (1 - t) * t * this.parabolaPeak.y + t * t * this.parabolaEnd.y;
+    this.position.z = (1 - t) * (1 - t) * this.parabolaStart.z + 2 * (1 - t) * t * this.parabolaPeak.z + t * t * this.parabolaEnd.z;
 
-      const dx = this.position.x - prevX;
-      const dz = this.position.z - prevZ;
+    const dx = this.position.x - prevX;
+    const dz = this.position.z - prevZ;
 
-      if (dx !== 0 || dz !== 0) {
-          this.orientation = Math.atan2(dx, dz);
-      }
+    if (dx !== 0 || dz !== 0) {
+        this.orientation = Math.atan2(dx, dz);
+    }
 
-      this.parabolaT += 1;
+    this.parabolaT += 1;
+}
+
+followLinearPath(targetPosition, heightOffset, onComplete) {
+    const hoverOffset = heightOffset;
+
+    const dx = targetPosition.x - this.position.x;
+    const dy = (targetPosition.y + hoverOffset) - this.position.y;
+    const dz = targetPosition.z - this.position.z;
+
+    const distance = Math.sqrt(dx * dx + dz * dz + dy * dy);
+
+    const fastThreshold = 2.0; // if more than 2 units away, move fast
+    const stopThreshold = 0.2; // if less than 0.2 units away, start slowing down
+
+    let speed = 0.5; // default speed
+
+    if (this.speed > 0) {
+      speed = this.speed;
+    }
+
+    console.log("speed: ", speed)
+    if (distance > fastThreshold) {
+        this.position.x += (dx / distance) * speed;
+        this.position.y += (dy / distance) * speed;
+        this.position.z += (dz / distance) * speed;
+    } else if (distance > stopThreshold) {
+        this.position.x += (dx / distance) * (speed / 5); // Reduce speed 
+        this.position.y += (dy / distance) * (speed / 5);
+        this.position.z += (dz / distance) * (speed / 5);
+    } else {
+        if (onComplete) onComplete();
+    }
+
+    if (dx !== 0 || dz !== 0) {
+        this.orientation = Math.atan2(dx, dz);
+    }
   }
-
-  followLinearPath(targetPosition, heightOffset, onComplete) {
-      const hoverOffset = heightOffset;
-
-      const dx = targetPosition.x - this.position.x;
-      const dy = (targetPosition.y + hoverOffset) - this.position.y;
-      const dz = targetPosition.z - this.position.z;
-
-      const distance = Math.sqrt(dx * dx + dz * dz + dy * dy);
-
-      const fastThreshold = 2.0; // if more than 2 units away, move fast
-      const stopThreshold = 0.2; // if less than 0.2 units away, start slowing down
-
-      let speed = 0.5; // default speed
-
-      if(this.speed > 0){
-        speed = this.speed;
-      }
-
-      if (distance > fastThreshold) {
-          this.position.x += (dx / distance) * speed;
-          this.position.y += (dy / distance) * speed;
-          this.position.z += (dz / distance) * speed;
-      } else if (distance > stopThreshold) {
-          this.position.x += (dx / distance) * (speed / 5); // Reduce speed 
-          this.position.y += (dy / distance) * (speed / 5);
-          this.position.z += (dz / distance) * (speed / 5);
-      } else {
-          if (onComplete) onComplete();
-      }
-
-      if (dx !== 0 || dz !== 0) {
-          this.orientation = Math.atan2(dx, dz);
-      }
-  }
-
 }
