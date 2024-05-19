@@ -45,7 +45,7 @@ export class MyScene extends CGFscene {
     this.gardenNumRows = 4;
     this.gardenNumColumns = 4;
     this.displayRockSet = false;
-    this.displayBee = false;
+    this.displayBee = true;
     this.displayPollen = true;
     this.displayHive = false;
     this.displayGrassField = false;
@@ -62,11 +62,14 @@ export class MyScene extends CGFscene {
     this.grassField = new MyGrassField(this, 5000, 50, 50, this.textures.grass);
 
     this.lastUpdateTime = null;
+
+    this.setUpdatePeriod(1000 / 60);
+    this.lastBeeUpdate = new Date().getTime();
   }
 
   loadTextures() {
     const texturePaths = {
-      panorama: "images/panorama_flowers.jpg",
+      panorama: "images/panorama.jpg",
       receptacles: ["images/receptacle_texture.jpg", "images/receptacle_texture2.jpg", "images/receptacle_texture3.jpg", "images/receptacle_texture4.jpg"],
       petals: ["images/petal_texture.png", "images/petal_texture2.jpg", "images/petal_texture3.jpeg", "images/petal_texture4.jpg"],
       stems: ["images/stem_texture.jpg", "images/stem_texture2.jpg", "images/stem_texture3.jpg", "images/stem_texture4.jpg"],
@@ -87,9 +90,10 @@ export class MyScene extends CGFscene {
       grass: new CGFtexture(this, texturePaths.grass)
     };
 
-    this.texture = new CGFtexture(this, "images/terrain.jpg");
+    this.texture = new CGFtexture(this, "images/plane_grass.jpg");
     this.appearance = new CGFappearance(this);
     this.appearance.setTexture(this.texture);
+    this.appearance.setEmission(0.2, 0.2, 0.2, 0.2);
     this.appearance.setTextureWrap('REPEAT', 'REPEAT');
    }
 
@@ -159,7 +163,6 @@ export class MyScene extends CGFscene {
 
     if(this.displayBee){
       this.pushMatrix();
-      this.bee.update(100, this.scaleFactor, this.speedFactor);
       this.bee.display();
       this.popMatrix();
     }
@@ -174,5 +177,11 @@ export class MyScene extends CGFscene {
   updateTimeFactor(deltaTime) {
     this.time += deltaTime;
     this.grassField.shader.setUniformsValues({ timeFactor: this.time });
+  }
+
+  update(t) {
+    let deltaTime = t - this.lastBeeUpdate;
+    this.bee.update(deltaTime, this.scaleFactor, this.speedFactor);
+    this.lastBeeUpdate = t;
   }
 }
