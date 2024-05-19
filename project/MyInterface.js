@@ -27,6 +27,10 @@ export class MyInterface extends CGFinterface {
         this.gui.add(this.scene, 'displayHive').name('Display Hive');
         this.gui.add(this.scene, 'displayGrassField').name('Display Grass Field');
 
+        // Add checkboxes to toggle the bee movement mode and extra mode
+        this.gui.add(this.scene, 'beeMovementMode', ['normal', 'enhanced']).name('Bee Movement Mode').onChange(this.updateBeeMovementMode.bind(this));
+        this.gui.add(this.scene, 'ParabolicMode').name('Bee Parabola Mode').onChange(this.updateBeeExtraMode.bind(this));
+
         //Slider element in GUI
         this.gui.add(this.scene, 'scaleFactor', 0.5, 3).name('Scale Factor');
         this.gui.add(this.scene, 'speedFactor', 0.1, 3).name('Speed Factor');
@@ -57,5 +61,13 @@ export class MyInterface extends CGFinterface {
 
     isKeyPressed(keycode) {
         return this.activeKeys[keycode] || false;
+    }
+
+    updateBeeMovementMode(value) {
+        this.scene.setBeeMovementMode(value);
+    }
+
+    updateBeeExtraMode(value) {
+        this.scene.setBeeExtraMode(value);
     }
 }

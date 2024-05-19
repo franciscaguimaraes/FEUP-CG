@@ -523,7 +523,11 @@ export class MyBee extends CGFobject {
         this.moveToFloorFlag = false;
         this.moveToInitialHeightAltFlag = false;
         this.ySpeed = 0; // Stop Y speed
-        this.speed = 0; // Stop XZ speed
+        if(this.originalSpeed) {
+          this.speed = this.originalSpeed; // Resume XZ speed
+        } else {
+          this.speed = 0;
+        }
         this.parabolaStart = null; // Reset parabolic path
         this.stopParabola = true; // Stop the parabolic movement
     };
@@ -845,7 +849,7 @@ export class MyBee extends CGFobject {
     this.position.y = newPosition.y;
     this.position.z = newPosition.z;
 
-    if(this.enhanced){
+    if(this.enhanced || (this.moveToHiveFlag && this.normal)){
       // Update orientation
 
       const dx = this.position.x - prevX;

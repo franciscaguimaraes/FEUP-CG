@@ -12,6 +12,8 @@ export class MyScene extends CGFscene {
   constructor() {
     super();
     this.time = 0;
+    this.beeMovementMode = 'normal'; // Initialize the bee movement mode
+    this.beeExtraMode = false; // Initialize the extra mode
   }
   
   init(application) {
@@ -65,6 +67,9 @@ export class MyScene extends CGFscene {
 
     this.setUpdatePeriod(1000 / 60);
     this.lastBeeUpdate = new Date().getTime();
+
+    this.setBeeMovementMode('normal'); // Set the initial bee movement mode
+    this.setBeeExtraMode(false); // Set the initial extra mode
   }
 
   loadTextures() {
@@ -114,6 +119,23 @@ export class MyScene extends CGFscene {
 
   updateGardenDimensions(){
     this.garden.setDisplayDimensions(this.gardenNumRows, this.gardenNumColumns);
+  }
+
+  setBeeMovementMode(mode) {
+    this.beeMovementMode = mode;
+    if (mode === 'normal') {
+      this.bee.normal = true;
+      this.bee.enhanced = false;
+    } else if (mode === 'enhanced') {
+      this.bee.normal = false;
+      this.bee.enhanced = true;
+    }
+    this.setBeeExtraMode(this.beeExtraMode); // Ensure extra mode is correctly applied
+  }
+
+  setBeeExtraMode(enabled) {
+    this.ParabolicMode = enabled;
+    this.bee.extra = enabled;
   }
 
   setDefaultAppearance() {
