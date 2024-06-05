@@ -15,6 +15,6 @@
   - [tp5](tp5/README.md)
   - [Project](project/README.md)
 
-Project Grade: 
+Project Grade: 19.0
 
 Developed by Francisca Guimarães and Inês Oliveira
